@@ -211,7 +211,8 @@
     - Test location snapshot and audit log creation
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 10.3, 15.1_
 
-- [-] 7. Implement attendance marking via QR scan
+- [x] 7. Implement attendance marking via QR scan
+
 
 
 
@@ -258,8 +259,12 @@
     - Test location snapshot and device tracking
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 12.1, 12.2, 12.3, 14.1, 14.2, 15.2_
 
-- [ ] 8. Implement rate limiting and anti-fraud detection
-  - [ ] 8.1 Set up Redis rate limiting
+- [-] 8. Implement rate limiting and anti-fraud detection
+
+
+
+  - [-] 8.1 Set up Redis rate limiting
+
     - Configure Redis connection in Django settings
     - Install django-ratelimit or implement custom rate limiting using Redis
     - _Requirements: 9.1, 9.2_
