@@ -85,26 +85,37 @@
     - Test location validation with various scenarios (valid, invalid coordinates, outside radius, poor accuracy)
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [-] 4. Implement authentication system
+- [x] 4. Implement authentication system
 
 
-  - [ ] 4.1 Set up JWT authentication
+
+
+
+
+  - [x] 4.1 Set up JWT authentication
+
     - Install and configure djangorestframework-simplejwt
     - Configure access token expiration (15 minutes) and refresh token expiration (7 days)
     - Create JWT token obtain and refresh endpoints
     - _Requirements: 1.1, 1.4_
-  - [ ] 4.2 Create user registration and login endpoints
+
+  - [x] 4.2 Create user registration and login endpoints
+
     - Implement user registration serializer with email, password, full_name, role validation
     - Implement login endpoint that returns JWT tokens and user profile
     - Hash passwords using bcrypt before storing
     - _Requirements: 1.1, 1.3, 5.1, 5.2_
-  - [ ] 4.3 Implement custom permission classes
+
+  - [x] 4.3 Implement custom permission classes
+
     - Create IsAdmin permission class that checks user role
     - Create IsTeacher permission class that checks user role
     - Create IsTeacherForCourse permission class that validates teacher assignment to course
     - Create IsStudentEnrolled permission class that validates student enrollment
     - _Requirements: 1.2, 2.1, 5.5_
-  - [ ] 4.4 Create user profile endpoints
+
+  - [x] 4.4 Create user profile endpoints
+
     - Implement GET /api/users/me endpoint that returns authenticated user profile
     - Include role and institution information in response
     - _Requirements: 1.1, 1.2_
@@ -115,7 +126,9 @@
     - Test permission classes with different user roles
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 5. Implement QR token generation and verification
+- [-] 5. Implement QR token generation and verification
+
+
   - [ ] 5.1 Create token generation service
     - Implement generate_qr_token function using JWT with session_id, nonce, iat, exp in payload
     - Sign JWT with server secret key using HS256 algorithm
