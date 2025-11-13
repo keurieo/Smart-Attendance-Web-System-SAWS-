@@ -44,6 +44,61 @@ class AttendanceSession(models.Model):
         return f"Session for {self.course.code} at {self.start_at}"
 
 
+class QRTokenManager(models.Manager):
+    """Custom manager for QRToken model."""
+    
+    def create_token(self, session, token, code6, expires_at):
+        """
+        Create a new QR token for an attendance session.
+        
+        Args:
+            session: AttendanceSession instance
+            token: JWT token string
+            code6: 6-digit code string
+            expires_at: DateTime when token expires
+            
+        Returns:
+            QRToken instance
+        """
+        qr_token = self.create(
+            session=session,
+            token=token,
+            code6=code6,
+            expires_at=expires_at
+        )
+        return qr_token
+    
+    def get_by_token(self, token):
+        """
+        Retrieve a QR token by token string.
+        
+        Args:
+            token: JWT token string
+            
+        Returns:
+            QRToken instance or None
+        """
+        try:
+            return self.get(token=token, is_revoked=False)
+        except self.model.DoesNotExist:
+            return None
+    
+    def get_by_code6(self, code6):
+        """
+        Retrieve a QR token by 6-digit code.
+        
+        Args:
+            code6: 6-digit code string
+            
+        Returns:
+            QRToken instance or None
+        """
+        try:
+            return self.get(code6=code6, is_revoked=False)
+        except self.model.DoesNotExist:
+            return None
+
+
 class QRToken(models.Model):
     """Model representing a QR token for attendance."""
     session = models.ForeignKey(AttendanceSession, on_delete=models.CASCADE, related_name='qr_tokens')
@@ -52,6 +107,8 @@ class QRToken(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     is_revoked = models.BooleanField(default=False)
+    
+    objects = QRTokenManager()
 
     class Meta:
         db_table = 'qr_tokens'
@@ -65,6 +122,11 @@ class QRToken(models.Model):
 
     def __str__(self):
         return f"Token for session {self.session.id} - {self.code6}"
+    
+    def revoke(self):
+        """Revoke this token."""
+        self.is_revoked = True
+        self.save(update_fields=['is_revoked'])
 
 
 class AttendanceRecord(models.Model):

@@ -126,20 +126,26 @@
     - Test permission classes with different user roles
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [-] 5. Implement QR token generation and verification
+- [x] 5. Implement QR token generation and verification
 
 
-  - [ ] 5.1 Create token generation service
+
+  - [x] 5.1 Create token generation service
+
+
     - Implement generate_qr_token function using JWT with session_id, nonce, iat, exp in payload
     - Sign JWT with server secret key using HS256 algorithm
     - Implement generate_6digit_code function using secrets module
     - _Requirements: 8.1, 8.2_
-  - [ ] 5.2 Create token verification service
+  - [x] 5.2 Create token verification service
+
     - Implement verify_qr_token function that decodes JWT and validates signature
     - Handle token expiration and invalid token errors
     - Return validation result with payload or error message
     - _Requirements: 8.3, 8.4_
-  - [ ] 5.3 Implement token storage and retrieval
+  - [x] 5.3 Implement token storage and retrieval
+
+
     - Create QRToken model manager methods for creating and retrieving tokens
     - Implement token revocation functionality
     - Enforce unique constraint on token field

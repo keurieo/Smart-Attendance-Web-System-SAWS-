@@ -2,13 +2,15 @@
 Django==4.2.7
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.0
+PyJWT==2.8.0
 
 # Database
 psycopg2-binary==2.9.9
 django-environ==0.11.2
 
 # Geospatial
-django-postgis==0.2.0
+# PostGIS support is built into Django's GIS framework
+# No additional package needed beyond psycopg2-binary
 
 # Redis and Caching
 redis==5.0.1
