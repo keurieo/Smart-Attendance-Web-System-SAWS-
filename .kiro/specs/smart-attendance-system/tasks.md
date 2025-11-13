@@ -1,0 +1,558 @@
+# Implementation Plan
+
+- [x] 1. Set up project structure and development environment
+
+
+
+
+
+  - Initialize Django project with apps: accounts, academics, attendance, geo, reports, audit
+  - Configure PostgreSQL with PostGIS extension in Docker Compose
+  - Set up Redis container for caching and rate limiting
+  - Create requirements files (base, development, production)
+  - Configure Django settings for multiple environments (base, development, production)
+  - Initialize React project with Tailwind CSS
+  - Configure ESLint, Prettier for code formatting
+  - Set up Git repository with .gitignore files
+  - _Requirements: 1.1, 1.2, 1.3, 13.1, 13.2, 13.3_
+
+- [-] 2. Implement database models and migrations
+
+
+
+  - [x] 2.1 Create core authentication models
+
+
+    - Implement Institution model with timezone field
+    - Implement custom User model extending AbstractBaseUser with role, institution, email, password_hash, full_name, is_active
+    - Implement Role model with name field (admin, teacher, student)
+    - Implement TeacherProfile model with user foreign key, employee_id, department_id, office_location (PointField)
+    - Implement StudentProfile model with user foreign key, roll_number, enrollment_year, department_id
+    - Create database migrations for authentication models
+    - _Requirements: 1.1, 1.2, 5.1, 5.2, 13.1, 13.4_
+  - [-] 2.2 Create academic models
+
+    - Implement Course model with institution, code, title, department_id, instructor foreign key
+    - Implement Enrollment model with student and course foreign keys, active flag, unique constraint on (student_id, course_id)
+    - Implement Schedule model with course foreign key, weekday, start_time, duration_minutes, location (PointField), room
+    - Create database migrations for academic models
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+  - [ ] 2.3 Create attendance models
+    - Implement AttendanceSession model with course, schedule, created_by, start_at, end_at, teacher_location (PointField), radius_meters, status, notes
+    - Implement QRToken model with session foreign key, token (unique), code6, created_at, expires_at, is_revoked
+    - Implement AttendanceRecord model with session, student, marked_at, method, token, student_location (PointField), distance_meters, status, reason, unique constraint on (session_id, student_id)
+    - Create database migrations for attendance models
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7_
+  - [ ] 2.4 Create audit and tracking models
+    - Implement AuditLog model with performed_by, action, target_table, target_id, old_data (JSONField), new_data (JSONField), performed_at
+    - Implement LocationSnapshot model with user, recorded_at, location (PointField), source
+    - Implement Device model with user, device_id, device_info (JSONField), last_seen
+    - Create database migrations for audit models
+    - Create database indexes on frequently queried fields
+    - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 14.1, 14.2, 14.3, 14.4, 14.5, 15.1, 15.2, 15.3, 15.4, 15.5_
+
+- [ ] 3. Implement geolocation utilities
+  - [ ] 3.1 Create Haversine distance calculation function
+    - Implement haversine_distance function that takes two lat/lon pairs and returns distance in meters
+    - Handle edge cases (poles, antimeridian crossing)
+    - _Requirements: 4.1, 4.3_
+  - [ ] 3.2 Create location validation function
+    - Implement validate_location function that checks coordinates validity (not 0,0)
+    - Validate location accuracy threshold (reject if accuracy > 100 meters)
+    - Calculate distance using Haversine and compare against radius
+    - Return validation result with distance and reason
+    - _Requirements: 4.2, 4.4, 4.5_
+  - [ ]* 3.3 Write unit tests for geolocation utilities
+    - Test Haversine calculation with known coordinate pairs
+    - Test location validation with various scenarios (valid, invalid coordinates, outside radius, poor accuracy)
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+
+- [ ] 4. Implement authentication system
+  - [ ] 4.1 Set up JWT authentication
+    - Install and configure djangorestframework-simplejwt
+    - Configure access token expiration (15 minutes) and refresh token expiration (7 days)
+    - Create JWT token obtain and refresh endpoints
+    - _Requirements: 1.1, 1.4_
+  - [ ] 4.2 Create user registration and login endpoints
+    - Implement user registration serializer with email, password, full_name, role validation
+    - Implement login endpoint that returns JWT tokens and user profile
+    - Hash passwords using bcrypt before storing
+    - _Requirements: 1.1, 1.3, 5.1, 5.2_
+  - [ ] 4.3 Implement custom permission classes
+    - Create IsAdmin permission class that checks user role
+    - Create IsTeacher permission class that checks user role
+    - Create IsTeacherForCourse permission class that validates teacher assignment to course
+    - Create IsStudentEnrolled permission class that validates student enrollment
+    - _Requirements: 1.2, 2.1, 5.5_
+  - [ ] 4.4 Create user profile endpoints
+    - Implement GET /api/users/me endpoint that returns authenticated user profile
+    - Include role and institution information in response
+    - _Requirements: 1.1, 1.2_
+  - [ ]* 4.5 Write authentication tests
+    - Test user registration with valid and invalid data
+    - Test login with correct and incorrect credentials
+    - Test JWT token refresh flow
+    - Test permission classes with different user roles
+    - _Requirements: 1.1, 1.2, 1.3, 1.4_
+
+- [ ] 5. Implement QR token generation and verification
+  - [ ] 5.1 Create token generation service
+    - Implement generate_qr_token function using JWT with session_id, nonce, iat, exp in payload
+    - Sign JWT with server secret key using HS256 algorithm
+    - Implement generate_6digit_code function using secrets module
+    - _Requirements: 8.1, 8.2_
+  - [ ] 5.2 Create token verification service
+    - Implement verify_qr_token function that decodes JWT and validates signature
+    - Handle token expiration and invalid token errors
+    - Return validation result with payload or error message
+    - _Requirements: 8.3, 8.4_
+  - [ ] 5.3 Implement token storage and retrieval
+    - Create QRToken model manager methods for creating and retrieving tokens
+    - Implement token revocation functionality
+    - Enforce unique constraint on token field
+    - _Requirements: 8.5_
+  - [ ]* 5.4 Write token generation and verification tests
+    - Test JWT token generation and structure
+    - Test 6-digit code generation (uniqueness, format)
+    - Test token verification with valid, expired, and invalid tokens
+    - Test token revocation
+    - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
+
+- [ ] 6. Implement attendance session creation
+  - [ ] 6.1 Create session creation serializer
+    - Implement AttendanceSessionSerializer with course_id, schedule_id, start_at, end_at, radius_meters fields
+    - Validate radius_meters is between 10 and 500
+    - Validate start_at is before end_at
+    - _Requirements: 2.1, 2.4_
+  - [ ] 6.2 Create session creation endpoint
+    - Implement POST /api/teacher/sessions endpoint
+    - Validate teacher is assigned to the specified course using IsTeacherForCourse permission
+    - Extract teacher location from request body
+    - Create AttendanceSession record with teacher location
+    - Generate QR token and 6-digit code using token generation service
+    - Create QRToken record linked to session
+    - Return session details, QR token, QR URL, and 6-digit code
+    - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.6_
+  - [ ] 6.3 Create location snapshot on session creation
+    - Implement location snapshot creation when teacher creates session
+    - Store teacher user_id, coordinates, timestamp, and source
+    - _Requirements: 15.1, 15.3_
+  - [ ] 6.4 Create audit log entry on session creation
+    - Implement audit logging when session is created
+    - Store performed_by, action, target_table, target_id, new_data
+    - _Requirements: 10.3_
+  - [ ]* 6.5 Write session creation tests
+    - Test successful session creation by assigned teacher
+    - Test rejection when teacher not assigned to course
+    - Test validation of radius_meters and time window
+    - Test QR token and 6-digit code generation
+    - Test location snapshot and audit log creation
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 10.3, 15.1_
+
+- [ ] 7. Implement attendance marking via QR scan
+  - [ ] 7.1 Create attendance marking serializer
+    - Implement AttendanceMarkingSerializer with token, student_location (lat/lon), device_info fields
+    - Validate token format
+    - Validate student_location coordinates
+    - _Requirements: 3.1, 3.2_
+  - [ ] 7.2 Create attendance marking endpoint
+    - Implement POST /api/student/attendance/scan endpoint
+    - Extract student user from authenticated request
+    - Verify QR token using token verification service
+    - Retrieve associated AttendanceSession
+    - Validate current server time is within session start_at and end_at window
+    - Validate student is enrolled in session's course
+    - Calculate distance between student and teacher locations using Haversine
+    - Validate distance against session radius using location validation function
+    - Create AttendanceRecord with appropriate status (present or rejected) and distance
+    - Handle duplicate submission error (unique constraint violation)
+    - Return attendance result with status, marked_at, distance_meters, and reason if rejected
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 4.1, 4.2, 4.3, 12.1, 12.2, 12.3_
+  - [ ] 7.3 Create location snapshot on attendance marking
+    - Implement location snapshot creation when student marks attendance
+    - Store student user_id, coordinates, timestamp, and source
+    - _Requirements: 15.2, 15.3_
+  - [ ] 7.4 Create device tracking on attendance marking
+    - Extract device information from request headers (user agent)
+    - Create or update Device record for student
+    - Update last_seen timestamp
+    - _Requirements: 14.1, 14.2, 14.3, 14.4_
+  - [ ]* 7.5 Write attendance marking tests
+    - Test successful attendance marking within radius and time window
+    - Test rejection when outside radius
+    - Test rejection when outside time window
+    - Test rejection with expired token
+    - Test rejection with invalid token
+    - Test duplicate submission prevention
+    - Test location snapshot and device tracking
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 12.1, 12.2, 12.3, 14.1, 14.2, 15.2_
+
+- [ ] 8. Implement rate limiting and anti-fraud detection
+  - [ ] 8.1 Set up Redis rate limiting
+    - Configure Redis connection in Django settings
+    - Install django-ratelimit or implement custom rate limiting using Redis
+    - _Requirements: 9.1, 9.2_
+  - [ ] 8.2 Apply rate limits to attendance endpoint
+    - Apply rate limit of 10 requests per minute per student user ID on attendance marking endpoint
+    - Apply rate limit of 50 requests per minute per IP address on attendance marking endpoint
+    - Return HTTP 429 when rate limit exceeded
+    - _Requirements: 9.1, 9.2, 9.5_
+  - [ ] 8.3 Implement fraud detection checks
+    - Detect when more than 5 students submit identical coordinates for same session
+    - Flag attendance records for admin review when identical coordinates detected
+    - Calculate time delta between device timestamp and server timestamp
+    - Flag attendance records when time delta exceeds 300 seconds
+    - _Requirements: 9.3, 9.4_
+  - [ ]* 8.4 Write rate limiting and fraud detection tests
+    - Test rate limiting enforcement on attendance endpoint
+    - Test identical coordinate detection
+    - Test time delta flagging
+    - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
+
+- [ ] 9. Implement admin user management
+  - [ ] 9.1 Create user management serializers
+    - Implement UserSerializer for user CRUD operations
+    - Implement UserCreateSerializer with password hashing
+    - Implement UserUpdateSerializer for role and status changes
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+  - [ ] 9.2 Create user management endpoints
+    - Implement GET /api/admin/users endpoint with pagination, filtering by role and active status
+    - Implement POST /api/admin/users endpoint with IsAdmin permission
+    - Implement PATCH /api/admin/users/:id endpoint with IsAdmin permission
+    - Implement DELETE /api/admin/users/:id endpoint (soft delete) with IsAdmin permission
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
+  - [ ] 9.3 Create audit logging for user operations
+    - Implement audit log creation on user create, update, and delete operations
+    - Store old_data and new_data as JSON
+    - _Requirements: 10.2_
+  - [ ]* 9.4 Write user management tests
+    - Test user listing with pagination and filters
+    - Test user creation by admin
+    - Test user update (role change, deactivation)
+    - Test soft delete
+    - Test permission enforcement (non-admin cannot access)
+    - Test audit log creation
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 10.2_
+
+- [ ] 10. Implement course and enrollment management
+  - [ ] 10.1 Create course management serializers
+    - Implement CourseSerializer with institution, code, title, instructor fields
+    - Implement EnrollmentSerializer with student and course fields
+    - Implement ScheduleSerializer with course, weekday, start_time, duration_minutes, location fields
+    - _Requirements: 6.1, 6.2, 6.5_
+  - [ ] 10.2 Create course management endpoints
+    - Implement POST /api/admin/courses endpoint with IsAdmin permission
+    - Implement POST /api/admin/enrollments endpoint with IsAdmin permission
+    - Implement PATCH /api/admin/schedules/:id endpoint with IsAdmin permission
+    - Validate student role when creating enrollment
+    - Validate teacher role when assigning instructor to course
+    - Enforce unique constraint on (student_id, course_id) for enrollments
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+  - [ ]* 10.3 Write course management tests
+    - Test course creation with valid instructor
+    - Test enrollment creation with validation
+    - Test duplicate enrollment prevention
+    - Test schedule creation and update
+    - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
+
+- [ ] 11. Implement attendance record override
+  - [ ] 11.1 Create override serializer
+    - Implement AttendanceOverrideSerializer with status and reason fields
+    - Validate reason is provided and non-empty
+    - Validate status is one of: present, absent, rejected, pending
+    - _Requirements: 7.1, 7.4_
+  - [ ] 11.2 Create override endpoint
+    - Implement PATCH /api/admin/attendance/:record_id endpoint with IsAdmin permission
+    - Retrieve existing AttendanceRecord
+    - Store old status in variable
+    - Update status and reason fields
+    - Create audit log entry with old_data (old status) and new_data (new status, reason)
+    - _Requirements: 7.1, 7.2, 7.3, 7.5_
+  - [ ]* 11.3 Write override tests
+    - Test successful override with reason
+    - Test rejection when reason is missing
+    - Test audit log creation with correct data
+    - Test permission enforcement
+    - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
+
+- [ ] 12. Implement teacher reporting
+  - [ ] 12.1 Create attendance report view
+    - Implement GET /api/teacher/reports endpoint with IsTeacher permission
+    - Accept query parameters: course_id, from_date, to_date
+    - Validate teacher is assigned to specified course
+    - Query attendance records filtered by course and date range
+    - Join with student user data to include name and email
+    - _Requirements: 11.1, 11.3, 11.4_
+  - [ ] 12.2 Create CSV export renderer
+    - Implement custom CSV renderer for Django REST Framework
+    - Format attendance data with columns: student_name, email, session_date, session_time, status, marked_at
+    - Stream CSV output for large datasets (>1000 records)
+    - _Requirements: 11.2, 11.5_
+  - [ ]* 12.3 Write reporting tests
+    - Test report generation with date filters
+    - Test permission enforcement (teacher can only access own courses)
+    - Test CSV export format
+    - Test streaming for large datasets
+    - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
+
+- [ ] 13. Implement audit log querying
+  - [ ] 13.1 Create audit log endpoint
+    - Implement GET /api/admin/audit endpoint with IsAdmin permission
+    - Accept query parameters: user_id, date_from, date_to, action, target_table
+    - Filter audit logs based on query parameters
+    - Implement pagination (50 records per page)
+    - Order by performed_at descending
+    - _Requirements: 10.5_
+  - [ ]* 13.2 Write audit log query tests
+    - Test filtering by user, date range, action, target table
+    - Test pagination
+    - Test permission enforcement
+    - _Requirements: 10.5_
+
+- [ ] 14. Implement session management endpoints
+  - [ ] 14.1 Create session detail endpoint
+    - Implement GET /api/teacher/sessions/:id endpoint with IsTeacher permission
+    - Validate teacher is assigned to session's course
+    - Return session details with list of attendance records
+    - Include student names and statuses
+    - _Requirements: 2.1, 2.2_
+  - [ ] 14.2 Create session expiration logic
+    - Implement automatic session status update to "expired" when end_at is reached
+    - Can be implemented as database query filter or background task
+    - _Requirements: 12.4_
+  - [ ]* 14.3 Write session management tests
+    - Test session detail retrieval
+    - Test permission enforcement
+    - Test session expiration logic
+    - _Requirements: 2.1, 2.2, 12.4_
+
+- [ ] 15. Build React frontend authentication
+  - [ ] 15.1 Create authentication context and hooks
+    - Implement AuthContext with user state, login, logout, and token refresh functions
+    - Implement useAuth hook to access auth context
+    - Store JWT tokens in localStorage
+    - Implement automatic token refresh on expiration
+    - _Requirements: 1.1, 1.4_
+  - [ ] 15.2 Create login page component
+    - Implement LoginForm component with email and password inputs
+    - Call login API endpoint on form submission
+    - Store tokens and user data in AuthContext
+    - Redirect to role-appropriate dashboard on success
+    - Display error messages on failure
+    - _Requirements: 1.1_
+  - [ ] 15.3 Create protected route component
+    - Implement ProtectedRoute wrapper component
+    - Check authentication status from AuthContext
+    - Redirect to login if not authenticated
+    - Optionally check user role for role-specific routes
+    - _Requirements: 1.2_
+  - [ ] 15.4 Set up API client with authentication
+    - Create Axios instance with base URL configuration
+    - Add request interceptor to include JWT token in Authorization header
+    - Add response interceptor to handle 401 errors and trigger token refresh
+    - _Requirements: 1.1, 1.4_
+
+- [ ] 16. Build teacher session creation interface
+  - [ ] 16.1 Create geolocation hook
+    - Implement useGeolocation hook that wraps navigator.geolocation API
+    - Request high accuracy location with timeout
+    - Return location state (latitude, longitude, accuracy) and error state
+    - Handle permission denial and errors
+    - _Requirements: 2.2, 2.6_
+  - [ ] 16.2 Create session creation modal component
+    - Implement CreateSessionModal with form fields: course selection, start_at, end_at, radius_meters
+    - Trigger geolocation capture when modal opens
+    - Display location capture status and accuracy
+    - Validate form inputs (start before end, radius in range)
+    - Call session creation API with teacher location
+    - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
+  - [ ] 16.3 Create QR code viewer component
+    - Implement QRViewer component that displays QR code and 6-digit code
+    - Use qrcode.react library to generate QR code from token
+    - Display session countdown timer
+    - Show session details (course, time window, radius)
+    - Provide option to copy 6-digit code
+    - _Requirements: 2.3, 2.5_
+  - [ ] 16.4 Create teacher dashboard with session list
+    - Implement TeacherDashboard component
+    - Display list of active and past sessions
+    - Show "Create Session" button that opens CreateSessionModal
+    - Display session cards with QR code preview and attendance count
+    - Link to session detail page
+    - _Requirements: 2.1, 2.2_
+
+- [ ] 17. Build student QR scanning interface
+  - [ ] 17.1 Create QR scanner component
+    - Implement QRScanner component using html5-qrcode library
+    - Request camera permission
+    - Display camera preview with scan overlay
+    - Emit scanned token to parent component
+    - Handle camera errors and permission denial
+    - _Requirements: 3.1_
+  - [ ] 17.2 Create manual code entry component
+    - Implement ManualCodeEntry component with 6-digit input field
+    - Validate input is 6 digits
+    - Submit code to parent component
+    - _Requirements: 3.1_
+  - [ ] 17.3 Create scan page component
+    - Implement ScanPage component with tabs for QR scan and manual entry
+    - Trigger geolocation capture when page loads
+    - Display location capture status
+    - Call attendance marking API with token and student location
+    - Display result (success with distance, or rejection with reason)
+    - Show error messages for location denial or API errors
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - [ ] 17.4 Create attendance history component
+    - Implement AttendanceHistory component for student dashboard
+    - Fetch and display student's attendance records
+    - Show course name, date, time, status, and distance
+    - Implement filtering by date range and course
+    - _Requirements: 3.1_
+
+- [ ] 18. Build admin management interface
+  - [ ] 18.1 Create user management component
+    - Implement UserManagement component with data table
+    - Display users with columns: name, email, role, status, actions
+    - Implement pagination, sorting, and filtering
+    - Add "Create User" button that opens modal form
+    - Add edit and delete actions for each user row
+    - Call admin user management APIs
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+  - [ ] 18.2 Create course management component
+    - Implement CourseManagement component with data table
+    - Display courses with columns: code, title, instructor, actions
+    - Add "Create Course" button that opens modal form
+    - Add enrollment management interface (add/remove students)
+    - Call admin course management APIs
+    - _Requirements: 6.1, 6.2_
+  - [ ] 18.3 Create attendance override component
+    - Implement AttendanceOverride modal component
+    - Display current attendance record details
+    - Provide status dropdown and reason text area
+    - Validate reason is provided
+    - Call override API and refresh attendance list
+    - _Requirements: 7.1, 7.2, 7.3_
+  - [ ] 18.4 Create audit log viewer component
+    - Implement AuditLog component with data table
+    - Display audit entries with columns: timestamp, user, action, target, details
+    - Implement filtering by user, date range, action type
+    - Display old_data and new_data in expandable rows
+    - Call audit log query API
+    - _Requirements: 10.5_
+
+- [ ] 19. Implement shared UI components
+  - [ ] 19.1 Create data table component
+    - Implement reusable DataTable component with props for columns, data, pagination
+    - Support sorting by column
+    - Support row actions (edit, delete, custom)
+    - Display loading and empty states
+    - _Requirements: All admin and reporting features_
+  - [ ] 19.2 Create modal component
+    - Implement reusable Modal component with props for title, content, actions
+    - Support open/close state management
+    - Handle backdrop click and escape key
+    - _Requirements: All create/edit forms_
+  - [ ] 19.3 Create toast notification component
+    - Implement Toast component for displaying success, error, info messages
+    - Support auto-dismiss with configurable timeout
+    - Position toasts in top-right corner
+    - Stack multiple toasts
+    - _Requirements: All user feedback scenarios_
+  - [ ] 19.4 Create map preview component
+    - Implement MapPreview component using Leaflet
+    - Display marker for teacher location
+    - Display circle overlay for radius
+    - Optionally display student location marker
+    - _Requirements: 2.6, 3.2_
+
+- [ ] 20. Implement error handling and validation
+  - [ ] 20.1 Create error handling utilities
+    - Implement error parsing function that extracts error_code and message from API responses
+    - Create user-friendly error message mapping
+    - Implement retry logic for network failures
+    - _Requirements: All API interactions_
+  - [ ] 20.2 Add form validation
+    - Implement client-side validation for all forms
+    - Display inline validation errors
+    - Prevent submission with invalid data
+    - Match backend validation rules
+    - _Requirements: All forms_
+  - [ ] 20.3 Add loading states
+    - Implement loading indicators for all async operations
+    - Disable form submissions during API calls
+    - Show skeleton loaders for data fetching
+    - _Requirements: All API interactions_
+
+- [ ] 21. Set up Docker containerization
+  - [ ] 21.1 Create backend Dockerfile
+    - Write Dockerfile for Django application
+    - Use Python 3.11 slim base image
+    - Install dependencies from requirements.txt
+    - Configure Gunicorn as WSGI server
+    - _Requirements: All backend features_
+  - [ ] 21.2 Create frontend Dockerfile
+    - Write Dockerfile for React application
+    - Use Node 18 base image for build stage
+    - Build production bundle
+    - Use nginx to serve static files
+    - _Requirements: All frontend features_
+  - [ ] 21.3 Create docker-compose configuration
+    - Write docker-compose.yml with services: db (PostgreSQL+PostGIS), redis, backend, frontend, nginx
+    - Configure environment variables
+    - Set up volume mounts for development
+    - Configure networking between services
+    - _Requirements: All features_
+  - [ ] 21.4 Create nginx configuration
+    - Write nginx.conf for reverse proxy
+    - Configure SSL/TLS termination
+    - Set up routing: /api/* to backend, /* to frontend
+    - Add security headers (HSTS, CSP, X-Frame-Options)
+    - _Requirements: All features_
+
+- [ ] 22. Implement CI/CD pipeline
+  - [ ] 22.1 Create GitHub Actions workflow
+    - Write workflow file for CI/CD
+    - Add linting step (flake8, ESLint)
+    - Add testing step (pytest, Jest)
+    - Add build step (Docker images)
+    - Add deployment step (push to registry)
+    - _Requirements: All features_
+  - [ ]* 22.2 Set up code quality checks
+    - Configure coverage reporting
+    - Set minimum coverage threshold (80%)
+    - Add type checking (mypy for Python)
+    - _Requirements: All features_
+
+- [ ] 23. Add monitoring and logging
+  - [ ] 23.1 Configure structured logging
+    - Set up JSON logging format for Django
+    - Configure log levels for different environments
+    - Add request ID tracking for tracing
+    - _Requirements: All features_
+  - [ ] 23.2 Create health check endpoint
+    - Implement /api/health endpoint
+    - Check database connectivity
+    - Check Redis connectivity
+    - Return status and component health
+    - _Requirements: All features_
+  - [ ]* 23.3 Set up application metrics
+    - Implement custom metrics for business events (sessions created, attendance marked)
+    - Track API latency and error rates
+    - _Requirements: All features_
+
+- [ ] 24. Create deployment documentation
+  - [ ] 24.1 Write setup instructions
+    - Document local development setup steps
+    - Document environment variable configuration
+    - Document database initialization and migrations
+    - _Requirements: All features_
+  - [ ] 24.2 Write deployment guide
+    - Document production deployment steps
+    - Document Docker Compose usage
+    - Document backup and restore procedures
+    - _Requirements: All features_
+  - [ ]* 24.3 Write API documentation
+    - Generate OpenAPI/Swagger documentation for all endpoints
+    - Document request/response formats
+    - Document authentication requirements
+    - _Requirements: All API endpoints_
