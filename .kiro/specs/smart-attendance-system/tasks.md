@@ -222,7 +222,8 @@
     - Validate token format
     - Validate student_location coordinates
     - _Requirements: 3.1, 3.2_
-  - [-] 7.2 Create attendance marking endpoint
+  - [x] 7.2 Create attendance marking endpoint
+
 
     - Implement POST /api/student/attendance/scan endpoint
     - Extract student user from authenticated request
@@ -236,11 +237,13 @@
     - Handle duplicate submission error (unique constraint violation)
     - Return attendance result with status, marked_at, distance_meters, and reason if rejected
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 4.1, 4.2, 4.3, 12.1, 12.2, 12.3_
-  - [ ] 7.3 Create location snapshot on attendance marking
+  - [x] 7.3 Create location snapshot on attendance marking
+
     - Implement location snapshot creation when student marks attendance
     - Store student user_id, coordinates, timestamp, and source
     - _Requirements: 15.2, 15.3_
-  - [ ] 7.4 Create device tracking on attendance marking
+  - [x] 7.4 Create device tracking on attendance marking
+
     - Extract device information from request headers (user agent)
     - Create or update Device record for student
     - Update last_seen timestamp
