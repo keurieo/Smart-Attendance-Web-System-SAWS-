@@ -130,6 +130,7 @@
 
 
 
+
   - [x] 5.1 Create token generation service
 
 
@@ -150,7 +151,15 @@
     - Implement token revocation functionality
     - Enforce unique constraint on token field
     - _Requirements: 8.5_
-  - [ ]* 5.4 Write token generation and verification tests
+  - [-] 5.4 Write token generation and verification tests
+
+
+
+
+
+
+
+
     - Test JWT token generation and structure
     - Test 6-digit code generation (uniqueness, format)
     - Test token verification with valid, expired, and invalid tokens

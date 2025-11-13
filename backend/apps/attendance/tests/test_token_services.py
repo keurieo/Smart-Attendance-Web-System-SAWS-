@@ -52,6 +52,42 @@ class TokenGenerationTests(TestCase):
         
         # With 100 codes, we should have high probability of uniqueness
         self.assertGreater(len(codes), 90)
+    
+    def test_generate_6digit_code_leading_zeros(self):
+        """Test that 6-digit codes can have leading zeros."""
+        # Generate many codes to increase probability of getting one with leading zero
+        codes = [generate_6digit_code() for _ in range(1000)]
+        
+        # Check that all codes are exactly 6 digits
+        for code in codes:
+            self.assertEqual(len(code), 6)
+            self.assertTrue(code.isdigit())
+        
+        # At least some codes should start with '0' (probabilistically)
+        codes_with_leading_zero = [c for c in codes if c.startswith('0')]
+        self.assertGreater(len(codes_with_leading_zero), 0)
+    
+    def test_generate_qr_token_different_sessions(self):
+        """Test that tokens for different sessions are unique."""
+        expires_at = datetime.utcnow() + timedelta(hours=1)
+        
+        token1, nonce1 = generate_qr_token(1, expires_at)
+        token2, nonce2 = generate_qr_token(2, expires_at)
+        
+        self.assertNotEqual(token1, token2)
+        self.assertNotEqual(nonce1, nonce2)
+    
+    def test_generate_qr_token_nonce_uniqueness(self):
+        """Test that nonces are unique across multiple token generations."""
+        expires_at = datetime.utcnow() + timedelta(hours=1)
+        nonces = set()
+        
+        for i in range(50):
+            token, nonce = generate_qr_token(i, expires_at)
+            nonces.add(nonce)
+        
+        # All nonces should be unique
+        self.assertEqual(len(nonces), 50)
 
 
 class TokenVerificationTests(TestCase):
@@ -91,3 +127,27 @@ class TokenVerificationTests(TestCase):
         self.assertFalse(is_valid)
         self.assertIsNone(payload)
         self.assertEqual(error, "Invalid token")
+    
+    def test_verify_empty_token(self):
+        """Test verification of empty token."""
+        is_valid, payload, error = verify_qr_token("")
+        
+        self.assertFalse(is_valid)
+        self.assertIsNone(payload)
+        self.assertEqual(error, "Invalid token")
+    
+    def test_token_contains_all_required_fields(self):
+        """Test that generated token contains all required fields."""
+        session_id = 999
+        expires_at = datetime.utcnow() + timedelta(hours=1)
+        
+        token, nonce = generate_qr_token(session_id, expires_at)
+        is_valid, payload, error = verify_qr_token(token)
+        
+        self.assertTrue(is_valid)
+        self.assertIn('session_id', payload)
+        self.assertIn('nonce', payload)
+        self.assertIn('iat', payload)
+        self.assertIn('exp', payload)
+        self.assertIn('type', payload)
+        self.assertEqual(payload['type'], 'attendance_qr')
