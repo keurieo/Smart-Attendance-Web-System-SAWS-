@@ -75,6 +75,7 @@ class AttendanceMarkingSerializer(serializers.Serializer):
     longitude = serializers.FloatField(required=True)
     accuracy = serializers.FloatField(required=False, allow_null=True, default=None)
     device_info = serializers.JSONField(required=False, allow_null=True, default=None)
+    device_timestamp = serializers.DateTimeField(required=False, allow_null=True, default=None)
     
     def validate_token(self, value):
         """Validate token format."""

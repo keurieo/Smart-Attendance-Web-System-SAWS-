@@ -10,6 +10,8 @@ import re
 from .models import AttendanceSession, QRToken, AttendanceRecord
 from .serializers import AttendanceSessionSerializer, AttendanceMarkingSerializer, AttendanceRecordSerializer
 from .services import generate_qr_token, generate_6digit_code, verify_qr_token
+from .ratelimit import attendance_rate_limit
+from .fraud_detection import check_fraud_indicators, flag_attendance_for_review
 from apps.accounts.permissions import IsTeacher, IsTeacherForCourse
 from apps.accounts.models import Role
 from apps.academics.models import Course, Schedule, Enrollment
@@ -170,9 +172,14 @@ class AttendanceMarkingView(views.APIView):
     API view for students to mark attendance via QR scan or manual code entry.
     
     POST /api/student/attendance/scan
+    
+    Rate limits:
+    - 10 requests per minute per student user ID
+    - 50 requests per minute per IP address
     """
     permission_classes = [IsAuthenticated]
     
+    @attendance_rate_limit
     @transaction.atomic
     def post(self, request):
         """
@@ -375,6 +382,23 @@ class AttendanceMarkingView(views.APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
+        # Run fraud detection checks (subtask 8.3)
+        device_timestamp = serializer.validated_data.get('device_timestamp')
+        fraud_result = check_fraud_indicators(
+            session=session,
+            student_location=student_location,
+            device_timestamp=device_timestamp,
+            server_timestamp=current_time
+        )
+        
+        # Flag attendance record if fraud indicators detected
+        if fraud_result['should_flag']:
+            flag_attendance_for_review(
+                attendance_record,
+                fraud_result['reasons'],
+                fraud_result['details']
+            )
+        
         # Create location snapshot (subtask 7.3)
         LocationSnapshot.objects.create(
             user=request.user,
@@ -428,6 +452,11 @@ class AttendanceMarkingView(views.APIView):
         
         if reason:
             response_data['reason'] = reason
+        
+        # Include fraud detection information if flagged
+        if fraud_result['should_flag']:
+            response_data['flagged_for_review'] = True
+            response_data['fraud_indicators'] = fraud_result['reasons']
         
         # Return appropriate status code
         if attendance_status == AttendanceRecord.PRESENT:

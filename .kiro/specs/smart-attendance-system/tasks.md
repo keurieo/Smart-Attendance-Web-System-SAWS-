@@ -259,21 +259,28 @@
     - Test location snapshot and device tracking
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 12.1, 12.2, 12.3, 14.1, 14.2, 15.2_
 
-- [-] 8. Implement rate limiting and anti-fraud detection
+- [x] 8. Implement rate limiting and anti-fraud detection
 
 
 
-  - [-] 8.1 Set up Redis rate limiting
+
+
+  - [x] 8.1 Set up Redis rate limiting
+
 
     - Configure Redis connection in Django settings
     - Install django-ratelimit or implement custom rate limiting using Redis
     - _Requirements: 9.1, 9.2_
-  - [ ] 8.2 Apply rate limits to attendance endpoint
+  - [x] 8.2 Apply rate limits to attendance endpoint
+
+
     - Apply rate limit of 10 requests per minute per student user ID on attendance marking endpoint
     - Apply rate limit of 50 requests per minute per IP address on attendance marking endpoint
     - Return HTTP 429 when rate limit exceeded
     - _Requirements: 9.1, 9.2, 9.5_
-  - [ ] 8.3 Implement fraud detection checks
+  - [x] 8.3 Implement fraud detection checks
+
+
     - Detect when more than 5 students submit identical coordinates for same session
     - Flag attendance records for admin review when identical coordinates detected
     - Calculate time delta between device timestamp and server timestamp
