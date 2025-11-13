@@ -30,20 +30,24 @@
     - Implement StudentProfile model with user foreign key, roll_number, enrollment_year, department_id
     - Create database migrations for authentication models
     - _Requirements: 1.1, 1.2, 5.1, 5.2, 13.1, 13.4_
-  - [-] 2.2 Create academic models
+  - [x] 2.2 Create academic models
+
 
     - Implement Course model with institution, code, title, department_id, instructor foreign key
     - Implement Enrollment model with student and course foreign keys, active flag, unique constraint on (student_id, course_id)
     - Implement Schedule model with course foreign key, weekday, start_time, duration_minutes, location (PointField), room
     - Create database migrations for academic models
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
-  - [ ] 2.3 Create attendance models
+  - [x] 2.3 Create attendance models
+
+
     - Implement AttendanceSession model with course, schedule, created_by, start_at, end_at, teacher_location (PointField), radius_meters, status, notes
     - Implement QRToken model with session foreign key, token (unique), code6, created_at, expires_at, is_revoked
     - Implement AttendanceRecord model with session, student, marked_at, method, token, student_location (PointField), distance_meters, status, reason, unique constraint on (session_id, student_id)
     - Create database migrations for attendance models
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7_
-  - [ ] 2.4 Create audit and tracking models
+  - [-] 2.4 Create audit and tracking models
+
     - Implement AuditLog model with performed_by, action, target_table, target_id, old_data (JSONField), new_data (JSONField), performed_at
     - Implement LocationSnapshot model with user, recorded_at, location (PointField), source
     - Implement Device model with user, device_id, device_info (JSONField), last_seen
