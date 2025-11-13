@@ -1,16 +1,20 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, views
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.gis.geos import Point
-from django.db import transaction
+from django.db import transaction, IntegrityError
+from django.utils import timezone
+import re
 
-from .models import AttendanceSession, QRToken
-from .serializers import AttendanceSessionSerializer
-from .services import generate_qr_token, generate_6digit_code
+from .models import AttendanceSession, QRToken, AttendanceRecord
+from .serializers import AttendanceSessionSerializer, AttendanceMarkingSerializer, AttendanceRecordSerializer
+from .services import generate_qr_token, generate_6digit_code, verify_qr_token
 from apps.accounts.permissions import IsTeacher, IsTeacherForCourse
-from apps.academics.models import Course, Schedule
-from apps.audit.models import AuditLog, LocationSnapshot
+from apps.accounts.models import Role
+from apps.academics.models import Course, Schedule, Enrollment
+from apps.audit.models import AuditLog, LocationSnapshot, Device
+from apps.geo.utils import validate_location
 
 
 class AttendanceSessionViewSet(viewsets.ModelViewSet):
