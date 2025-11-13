@@ -1,5 +1,10 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import AttendanceSessionViewSet
+
+router = DefaultRouter()
+router.register(r'sessions', AttendanceSessionViewSet, basename='session')
 
 urlpatterns = [
-    # URLs will be added in later tasks
+    path('', include(router.urls)),
 ]

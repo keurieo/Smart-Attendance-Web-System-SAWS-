@@ -151,7 +151,10 @@
     - Implement token revocation functionality
     - Enforce unique constraint on token field
     - _Requirements: 8.5_
-  - [-] 5.4 Write token generation and verification tests
+  - [x] 5.4 Write token generation and verification tests
+
+
+
 
 
 
@@ -166,13 +169,22 @@
     - Test token revocation
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 6. Implement attendance session creation
-  - [ ] 6.1 Create session creation serializer
+- [x] 6. Implement attendance session creation
+
+
+
+
+
+  - [x] 6.1 Create session creation serializer
+
+
     - Implement AttendanceSessionSerializer with course_id, schedule_id, start_at, end_at, radius_meters fields
     - Validate radius_meters is between 10 and 500
     - Validate start_at is before end_at
     - _Requirements: 2.1, 2.4_
-  - [ ] 6.2 Create session creation endpoint
+  - [x] 6.2 Create session creation endpoint
+
+
     - Implement POST /api/teacher/sessions endpoint
     - Validate teacher is assigned to the specified course using IsTeacherForCourse permission
     - Extract teacher location from request body
@@ -181,11 +193,13 @@
     - Create QRToken record linked to session
     - Return session details, QR token, QR URL, and 6-digit code
     - _Requirements: 2.1, 2.2, 2.3, 2.5, 2.6_
-  - [ ] 6.3 Create location snapshot on session creation
+  - [x] 6.3 Create location snapshot on session creation
+
     - Implement location snapshot creation when teacher creates session
     - Store teacher user_id, coordinates, timestamp, and source
     - _Requirements: 15.1, 15.3_
-  - [ ] 6.4 Create audit log entry on session creation
+  - [x] 6.4 Create audit log entry on session creation
+
     - Implement audit logging when session is created
     - Store performed_by, action, target_table, target_id, new_data
     - _Requirements: 10.3_
@@ -197,13 +211,19 @@
     - Test location snapshot and audit log creation
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 10.3, 15.1_
 
-- [ ] 7. Implement attendance marking via QR scan
-  - [ ] 7.1 Create attendance marking serializer
+- [-] 7. Implement attendance marking via QR scan
+
+
+
+  - [x] 7.1 Create attendance marking serializer
+
+
     - Implement AttendanceMarkingSerializer with token, student_location (lat/lon), device_info fields
     - Validate token format
     - Validate student_location coordinates
     - _Requirements: 3.1, 3.2_
-  - [ ] 7.2 Create attendance marking endpoint
+  - [-] 7.2 Create attendance marking endpoint
+
     - Implement POST /api/student/attendance/scan endpoint
     - Extract student user from authenticated request
     - Verify QR token using token verification service
