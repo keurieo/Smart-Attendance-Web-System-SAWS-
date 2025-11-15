@@ -94,7 +94,8 @@ def validate_location(
         }
     
     # Check location accuracy threshold (reject if accuracy > 100 meters)
-    if student_accuracy > 100:
+    # Only check if accuracy is provided and not None
+    if student_accuracy is not None and student_accuracy > 100:
         return {
             'valid': False,
             'distance': None,

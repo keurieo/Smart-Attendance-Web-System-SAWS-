@@ -120,10 +120,8 @@ const CreateSessionModal = ({ isOpen, onClose, onSuccess, courses, schedules }) 
         start_at: formData.start_at,
         end_at: formData.end_at,
         radius_meters: parseInt(formData.radius_meters),
-        teacher_location: {
-          latitude: location.latitude,
-          longitude: location.longitude,
-        },
+        latitude: location.latitude,
+        longitude: location.longitude,
       };
 
       const response = await attendanceAPI.createSession(requestData);

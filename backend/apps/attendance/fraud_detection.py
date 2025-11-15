@@ -34,7 +34,9 @@ def detect_identical_coordinates(session, student_location, threshold=5):
         student_location__distance_lte=(student_location, D(m=1))
     ).count()
     
-    # Check if count exceeds threshold
+    # Check if count meets or exceeds threshold
+    # Note: This is called AFTER the current record is created, so the count includes it
+    # If threshold is 5 and count is 5, it means 5 students (including current) are at same location
     is_suspicious = identical_count >= threshold
     
     return is_suspicious, identical_count

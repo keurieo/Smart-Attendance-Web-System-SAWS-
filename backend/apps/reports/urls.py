@@ -2,5 +2,6 @@ from django.urls import path
 from .views import AttendanceReportView
 
 urlpatterns = [
-    path('attendance/', AttendanceReportView.as_view(), name='attendance-report'),
+    # Teacher endpoints for reports
+    path('teacher/reports/', AttendanceReportView.as_view(), name='teacher-attendance-report'),
 ]

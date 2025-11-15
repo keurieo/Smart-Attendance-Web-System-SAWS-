@@ -13,16 +13,23 @@ class AttendanceSessionManager(models.Manager):
         This ensures that whenever sessions are queried, their status is current.
         """
         from django.utils import timezone
+        from django.db import connection
         
         # Get the base queryset
         queryset = super().get_queryset()
         
-        # Update expired sessions (sessions where end_at has passed and status is still active)
-        current_time = timezone.now()
-        queryset.filter(
-            end_at__lt=current_time,
-            status=self.model.ACTIVE
-        ).update(status=self.model.EXPIRED)
+        # Only update if the table exists (avoid errors during migrations)
+        if self.model._meta.db_table in connection.introspection.table_names():
+            try:
+                # Update expired sessions (sessions where end_at has passed and status is still active)
+                current_time = timezone.now()
+                queryset.filter(
+                    end_at__lt=current_time,
+                    status=self.model.ACTIVE
+                ).update(status=self.model.EXPIRED)
+            except Exception:
+                # Silently fail if there's any database error (e.g., during migrations)
+                pass
         
         return queryset
     

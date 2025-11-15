@@ -1,0 +1,387 @@
+/* Custom CSS for Smart Attendance System Django Admin */
+
+/* Header styling */
+#header {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    padding: 15px 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#branding h1 {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 24px;
+    margin: 0;
+    padding: 0;
+}
+
+#branding h1 a:link,
+#branding h1 a:visited {
+    color: #ffffff;
+}
+
+#user-tools {
+    color: #dbeafe;
+    font-size: 13px;
+}
+
+#user-tools a {
+    color: #ffffff;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+}
+
+#user-tools a:hover {
+    border-bottom-color: #ffffff;
+}
+
+/* Breadcrumbs */
+div.breadcrumbs {
+    background: #f3f4f6;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+}
+
+div.breadcrumbs a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+div.breadcrumbs a:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+/* Module styling */
+.module {
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.module h2 {
+    background: #f9fafb;
+    border-bottom: 2px solid #2563eb;
+    padding: 12px 15px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Table styling */
+#result_list {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#result_list thead th {
+    background: #f9fafb;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 12px 10px;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+#result_list tbody tr {
+    transition: background-color 0.2s;
+}
+
+#result_list tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+#result_list tbody td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+/* Action buttons */
+.button, input[type=submit], input[type=button], .submit-row input, button {
+    background: #2563eb;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, button:hover {
+    background: #1d4ed8;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+    background: #16a34a;
+}
+
+.button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+    background: #15803d;
+}
+
+/* Delete button */
+.deletelink, .deletelink-box a.deletelink {
+    background: #dc2626;
+}
+
+.deletelink:hover, .deletelink-box a.deletelink:hover {
+    background: #b91c1c;
+}
+
+/* Fieldsets */
+.module.aligned .form-row {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+fieldset.module {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+fieldset.module h2 {
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 15px;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Collapsed fieldsets */
+fieldset.collapsed * {
+    display: none;
+}
+
+fieldset.collapsed h2, fieldset.collapsed {
+    display: block !important;
+}
+
+fieldset.collapsed h2 {
+    cursor: pointer;
+}
+
+/* Messages */
+.messagelist {
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.messagelist li {
+    padding: 12px 20px;
+    margin: 0 0 5px 0;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.messagelist .success {
+    background: #d1fae5;
+    color: #065f46;
+    border-left: 4px solid #16a34a;
+}
+
+.messagelist .warning {
+    background: #fef3c7;
+    color: #92400e;
+    border-left: 4px solid #f59e0b;
+}
+
+.messagelist .error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #dc2626;
+}
+
+.messagelist .info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid #2563eb;
+}
+
+/* Dashboard */
+#content-main {
+    padding: 20px;
+}
+
+.dashboard .module table {
+    width: 100%;
+}
+
+.dashboard .module table th {
+    text-align: left;
+    padding: 10px;
+    background: #f9fafb;
+    font-weight: 600;
+}
+
+.dashboard .module table td {
+    padding: 10px;
+    border-top: 1px solid #f3f4f6;
+}
+
+/* Sidebar */
+#content-related {
+    background: #f9fafb;
+    border-left: 1px solid #e5e7eb;
+    padding: 20px;
+}
+
+#content-related h3 {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* Filters */
+#changelist-filter {
+    background: #f9fafb;
+    border-left: 1px solid #e5e7eb;
+    padding: 20px;
+}
+
+#changelist-filter h2 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 10px;
+}
+
+#changelist-filter h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    margin: 15px 0 8px 0;
+}
+
+#changelist-filter ul {
+    padding: 0;
+    margin: 0;
+}
+
+#changelist-filter li {
+    list-style: none;
+    padding: 6px 0;
+}
+
+#changelist-filter a {
+    color: #2563eb;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+#changelist-filter a:hover {
+    color: #1d4ed8;
+}
+
+#changelist-filter a.selected {
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+/* Search bar */
+#changelist-search {
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+#changelist-search input[type="text"] {
+    padding: 10px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 300px;
+}
+
+#changelist-search input[type="text"]:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Pagination */
+.paginator {
+    padding: 15px 0;
+    text-align: center;
+}
+
+.paginator a, .paginator span {
+    padding: 8px 12px;
+    margin: 0 2px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #2563eb;
+    transition: background-color 0.2s;
+}
+
+.paginator a:hover {
+    background: #dbeafe;
+}
+
+.paginator .this-page {
+    background: #2563eb;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Form inputs */
+input[type="text"], input[type="password"], input[type="email"], 
+input[type="url"], input[type="number"], input[type="date"], 
+input[type="time"], input[type="datetime-local"], textarea, select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus,
+input[type="url"]:focus, input[type="number"]:focus, input[type="date"]:focus,
+input[type="time"]:focus, input[type="datetime-local"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Help text */
+.help, p.help, form .help {
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Error messages */
+.errorlist {
+    color: #dc2626;
+    background: #fee2e2;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 8px 0;
+    list-style: none;
+}
+
+.errorlist li {
+    margin: 0;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    #changelist-filter {
+        display: none;
+    }
+    
+    #changelist-search input[type="text"] {
+        width: 100%;
+    }
+}

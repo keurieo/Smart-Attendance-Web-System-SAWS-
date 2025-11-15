@@ -429,7 +429,11 @@
     - Implement pagination (50 records per page)
     - Order by performed_at descending
     - _Requirements: 10.5_
-  - [ ]* 13.2 Write audit log query tests
+  - [-] 13.2 Write audit log query tests
+
+
+
+
     - Test filtering by user, date range, action, target table
     - Test pagination
     - Test permission enforcement

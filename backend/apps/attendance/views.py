@@ -613,3 +613,118 @@ class AttendanceOverrideView(views.APIView):
             },
             status=status.HTTP_200_OK
         )
+
+
+
+class StudentAttendanceHistoryView(views.APIView):
+    """
+    API view for students to view their attendance history.
+    
+    GET /api/student/attendance/
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        """
+        Get attendance history for the authenticated student.
+        
+        Query parameters:
+        - course_id (optional): Filter by course ID
+        - from_date (optional): Filter from date (YYYY-MM-DD)
+        - to_date (optional): Filter to date (YYYY-MM-DD)
+        - status (optional): Filter by status (present, absent, rejected, pending)
+        """
+        # Validate user is a student
+        if not hasattr(request.user, 'role') or request.user.role.name != Role.STUDENT:
+            return Response(
+                {
+                    'error_code': 'AUTH_003',
+                    'message': 'Only students can view attendance history',
+                    'timestamp': timezone.now().isoformat()
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Build query filters
+        filters = {'student': request.user}
+        
+        # Filter by course
+        course_id = request.query_params.get('course_id')
+        if course_id:
+            try:
+                filters['session__course_id'] = int(course_id)
+            except ValueError:
+                return Response(
+                    {
+                        'error_code': 'VAL_001',
+                        'message': 'Invalid course_id parameter',
+                        'timestamp': timezone.now().isoformat()
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        # Filter by date range
+        from_date = request.query_params.get('from_date')
+        if from_date:
+            try:
+                from_date_obj = timezone.datetime.strptime(from_date, '%Y-%m-%d').date()
+                filters['marked_at__date__gte'] = from_date_obj
+            except ValueError:
+                return Response(
+                    {
+                        'error_code': 'VAL_001',
+                        'message': 'Invalid from_date format. Use YYYY-MM-DD',
+                        'timestamp': timezone.now().isoformat()
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        to_date = request.query_params.get('to_date')
+        if to_date:
+            try:
+                to_date_obj = timezone.datetime.strptime(to_date, '%Y-%m-%d').date()
+                filters['marked_at__date__lte'] = to_date_obj
+            except ValueError:
+                return Response(
+                    {
+                        'error_code': 'VAL_001',
+                        'message': 'Invalid to_date format. Use YYYY-MM-DD',
+                        'timestamp': timezone.now().isoformat()
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        # Filter by status
+        status_param = request.query_params.get('status')
+        if status_param:
+            if status_param not in [AttendanceRecord.PRESENT, AttendanceRecord.ABSENT, 
+                                   AttendanceRecord.REJECTED, AttendanceRecord.PENDING]:
+                return Response(
+                    {
+                        'error_code': 'VAL_001',
+                        'message': f'Invalid status. Must be one of: present, absent, rejected, pending',
+                        'timestamp': timezone.now().isoformat()
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            filters['status'] = status_param
+        
+        # Query attendance records
+        attendance_records = AttendanceRecord.objects.filter(
+            **filters
+        ).select_related(
+            'session__course',
+            'session__schedule'
+        ).order_by('-marked_at')
+        
+        # Serialize and return
+        serializer = AttendanceRecordSerializer(attendance_records, many=True)
+        
+        return Response(
+            {
+                'count': attendance_records.count(),
+                'results': serializer.data,
+                'timestamp': timezone.now().isoformat()
+            },
+            status=status.HTTP_200_OK
+        )
