@@ -562,15 +562,13 @@
     - Submit code to parent component
     - _Requirements: 3.1_
 
-
-  - [ ] 17.3 Create scan page component
+  - [x] 17.3 Create scan page component
     - Implement ScanPage component with tabs for QR scan and manual entry
     - Trigger geolocation capture when page loads
     - Display location capture status
     - Call attendance marking API with token and student location
     - Display result (success with distance, or rejection with reason)
     - Show error messages for location denial or API errors
-
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
   - [x] 17.4 Create attendance history component
 
