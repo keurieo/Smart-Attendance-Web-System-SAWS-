@@ -501,7 +501,9 @@
     - _Requirements: 1.1, 1.4_
 -
 
-- [ ] 16. Build teacher session creation interface
+- [x] 16. Build teacher session creation interface
+
+
 
   - [x] 16.1 Create geolocation hook
 
@@ -529,7 +531,8 @@
     - Show session details (course, time window, radius)
     - Provide option to copy 6-digit code
     - _Requirements: 2.3, 2.5_
-  - [-] 16.4 Create teacher dashboard with session list
+  - [x] 16.4 Create teacher dashboard with session list
+
 
     - Implement TeacherDashboard component
     - Display list of active and past sessions
@@ -538,14 +541,20 @@
     - Link to session detail page
     - _Requirements: 2.1, 2.2_
 
-- [ ] 17. Build student QR scanning interface
-  - [ ] 17.1 Create QR scanner component
+- [-] 17. Build student QR scanning interface
+
+
+
+  - [x] 17.1 Create QR scanner component
+
+
     - Implement QRScanner component using html5-qrcode library
     - Request camera permission
     - Display camera preview with scan overlay
     - Emit scanned token to parent component
     - Handle camera errors and permission denial
     - _Requirements: 3.1_
+
   - [ ] 17.2 Create manual code entry component
     - Implement ManualCodeEntry component with 6-digit input field
     - Validate input is 6 digits
@@ -567,6 +576,7 @@
     - _Requirements: 3.1_
 
 - [ ] 18. Build admin management interface
+
   - [ ] 18.1 Create user management component
     - Implement UserManagement component with data table
     - Display users with columns: name, email, role, status, actions
@@ -576,6 +586,8 @@
     - Call admin user management APIs
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
   - [ ] 18.2 Create course management component
+
+
     - Implement CourseManagement component with data table
     - Display courses with columns: code, title, instructor, actions
     - Add "Create Course" button that opens modal form
@@ -598,6 +610,7 @@
     - _Requirements: 10.5_
 
 - [ ] 19. Implement shared UI components
+
   - [ ] 19.1 Create data table component
     - Implement reusable DataTable component with props for columns, data, pagination
     - Support sorting by column
@@ -623,6 +636,7 @@
     - _Requirements: 2.6, 3.2_
 
 - [ ] 20. Implement error handling and validation
+
   - [ ] 20.1 Create error handling utilities
     - Implement error parsing function that extracts error_code and message from API responses
     - Create user-friendly error message mapping
@@ -641,6 +655,7 @@
     - _Requirements: All API interactions_
 
 - [ ] 21. Set up Docker containerization
+
   - [ ] 21.1 Create backend Dockerfile
     - Write Dockerfile for Django application
     - Use Python 3.11 slim base image
@@ -654,6 +669,7 @@
     - Use nginx to serve static files
     - _Requirements: All frontend features_
   - [ ] 21.3 Create docker-compose configuration
+
     - Write docker-compose.yml with services: db (PostgreSQL+PostGIS), redis, backend, frontend, nginx
     - Configure environment variables
     - Set up volume mounts for development
