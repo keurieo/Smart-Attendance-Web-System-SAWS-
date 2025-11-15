@@ -200,4 +200,16 @@ export const reportAPI = {
   }),
 };
 
+/**
+ * Wrapper for API calls with automatic retry logic
+ * @param {Function} requestFn - Function that returns an axios promise
+ * @param {Object} options - Retry options
+ * @returns {Promise} Result of the request
+ */
+export const apiWithRetry = async (requestFn, options = {}) => {
+  const { maxRetries = 3, shouldRetry = isRetryableError } = options;
+  
+  return retryRequest(requestFn, maxRetries);
+};
+
 export default api;
