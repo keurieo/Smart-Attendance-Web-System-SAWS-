@@ -541,9 +541,7 @@
     - Link to session detail page
     - _Requirements: 2.1, 2.2_
 
-- [-] 17. Build student QR scanning interface
-
-
+- [x] 17. Build student QR scanning interface
 
   - [x] 17.1 Create QR scanner component
 
@@ -572,15 +570,19 @@
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
   - [x] 17.4 Create attendance history component
 
+
     - Implement AttendanceHistory component for student dashboard
     - Fetch and display student's attendance records
     - Show course name, date, time, status, and distance
     - Implement filtering by date range and course
     - _Requirements: 3.1_
+-
 
 - [ ] 18. Build admin management interface
 
-  - [ ] 18.1 Create user management component
+  - [x] 18.1 Create user management component
+
+
     - Implement UserManagement component with data table
     - Display users with columns: name, email, role, status, actions
     - Implement pagination, sorting, and filtering
@@ -588,7 +590,9 @@
     - Add edit and delete actions for each user row
     - Call admin user management APIs
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
-  - [ ] 18.2 Create course management component
+  - [x] 18.2 Create course management component
+
+
 
 
     - Implement CourseManagement component with data table
@@ -597,7 +601,8 @@
     - Add enrollment management interface (add/remove students)
     - Call admin course management APIs
     - _Requirements: 6.1, 6.2_
-  - [ ] 18.3 Create attendance override component
+  - [-] 18.3 Create attendance override component
+
     - Implement AttendanceOverride modal component
     - Display current attendance record details
     - Provide status dropdown and reason text area
@@ -672,6 +677,7 @@
     - Use nginx to serve static files
     - _Requirements: All frontend features_
   - [ ] 21.3 Create docker-compose configuration
+
 
     - Write docker-compose.yml with services: db (PostgreSQL+PostGIS), redis, backend, frontend, nginx
     - Configure environment variables
