@@ -132,3 +132,100 @@ class UserProfileSerializer(serializers.ModelSerializer):
             except StudentProfile.DoesNotExist:
                 return None
         return None
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """Serializer for user CRUD operations."""
+    role = serializers.CharField(source='role.name', read_only=True)
+    institution_name = serializers.CharField(source='institution.name', read_only=True)
+    
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'full_name', 'role', 'institution_name', 'is_active', 'created_at', 'updated_at', 'last_login']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'last_login']
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    """Serializer for creating users with password hashing."""
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    role = serializers.CharField(required=True, write_only=True)
+    institution_id = serializers.IntegerField(required=True, write_only=True)
+    
+    class Meta:
+        model = User
+        fields = ['email', 'password', 'full_name', 'role', 'institution_id']
+    
+    def validate_role(self, value):
+        """Validate role is valid."""
+        if value not in [Role.ADMIN, Role.TEACHER, Role.STUDENT]:
+            raise serializers.ValidationError(
+                f"Invalid role. Must be one of: {Role.ADMIN}, {Role.TEACHER}, {Role.STUDENT}"
+            )
+        return value
+    
+    def validate_institution_id(self, value):
+        """Validate institution exists."""
+        try:
+            Institution.objects.get(id=value)
+        except Institution.DoesNotExist:
+            raise serializers.ValidationError("Institution does not exist.")
+        return value
+    
+    def validate_email(self, value):
+        """Validate email is unique."""
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
+    
+    def create(self, validated_data):
+        """Create user with hashed password."""
+        role_name = validated_data.pop('role')
+        institution_id = validated_data.pop('institution_id')
+        
+        # Get role and institution objects
+        role = Role.objects.get(name=role_name)
+        institution = Institution.objects.get(id=institution_id)
+        
+        # Create user with hashed password (using bcrypt via set_password)
+        user = User.objects.create_user(
+            email=validated_data['email'],
+            password=validated_data['password'],
+            full_name=validated_data['full_name'],
+            role=role,
+            institution=institution
+        )
+        
+        return user
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating user role and status."""
+    role = serializers.CharField(required=False, write_only=True)
+    
+    class Meta:
+        model = User
+        fields = ['full_name', 'role', 'is_active']
+    
+    def validate_role(self, value):
+        """Validate role is valid."""
+        if value not in [Role.ADMIN, Role.TEACHER, Role.STUDENT]:
+            raise serializers.ValidationError(
+                f"Invalid role. Must be one of: {Role.ADMIN}, {Role.TEACHER}, {Role.STUDENT}"
+            )
+        return value
+    
+    def update(self, instance, validated_data):
+        """Update user with role change if provided."""
+        role_name = validated_data.pop('role', None)
+        
+        # Update basic fields
+        instance.full_name = validated_data.get('full_name', instance.full_name)
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+        
+        # Update role if provided
+        if role_name:
+            role = Role.objects.get(name=role_name)
+            instance.role = role
+        
+        instance.save()
+        return instance

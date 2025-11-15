@@ -5,14 +5,20 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.gis.geos import Point
 from django.db import transaction, IntegrityError
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 import re
 
 from .models import AttendanceSession, QRToken, AttendanceRecord
-from .serializers import AttendanceSessionSerializer, AttendanceMarkingSerializer, AttendanceRecordSerializer
+from .serializers import (
+    AttendanceSessionSerializer, 
+    AttendanceMarkingSerializer, 
+    AttendanceRecordSerializer,
+    AttendanceOverrideSerializer
+)
 from .services import generate_qr_token, generate_6digit_code, verify_qr_token
 from .ratelimit import attendance_rate_limit
 from .fraud_detection import check_fraud_indicators, flag_attendance_for_review
-from apps.accounts.permissions import IsTeacher, IsTeacherForCourse
+from apps.accounts.permissions import IsTeacher, IsTeacherForCourse, IsAdmin
 from apps.accounts.models import Role
 from apps.academics.models import Course, Schedule, Enrollment
 from apps.audit.models import AuditLog, LocationSnapshot, Device
@@ -463,3 +469,89 @@ class AttendanceMarkingView(views.APIView):
             return Response(response_data, status=status.HTTP_201_CREATED)
         else:
             return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class AttendanceOverrideView(views.APIView):
+    """
+    API view for admins to override attendance records.
+    
+    PATCH /api/admin/attendance/:record_id
+    """
+    permission_classes = [IsAuthenticated, IsAdmin]
+    
+    @transaction.atomic
+    def patch(self, request, record_id):
+        """
+        Override an attendance record status with a mandatory reason.
+        
+        Request body:
+        {
+            "status": "present|absent|rejected|pending",
+            "reason": "Reason for override"
+        }
+        """
+        # Validate request data
+        serializer = AttendanceOverrideSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                {
+                    'error_code': 'VAL_001',
+                    'message': 'Invalid request data',
+                    'details': serializer.errors,
+                    'timestamp': timezone.now().isoformat()
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Retrieve existing AttendanceRecord
+        attendance_record = get_object_or_404(AttendanceRecord, id=record_id)
+        
+        # Store old status
+        old_status = attendance_record.status
+        old_reason = attendance_record.reason
+        
+        # Extract new values
+        new_status = serializer.validated_data['status']
+        new_reason = serializer.validated_data['reason']
+        
+        # Update status and reason fields
+        attendance_record.status = new_status
+        attendance_record.reason = new_reason
+        attendance_record.save(update_fields=['status', 'reason', 'updated_at'])
+        
+        # Create audit log entry with old_data and new_data
+        AuditLog.objects.create(
+            performed_by=request.user,
+            action='override_attendance_record',
+            target_table='attendance_records',
+            target_id=attendance_record.id,
+            old_data={
+                'status': old_status,
+                'reason': old_reason,
+                'student_id': attendance_record.student.id,
+                'student_name': attendance_record.student.full_name,
+                'session_id': attendance_record.session.id,
+                'course_code': attendance_record.session.course.code
+            },
+            new_data={
+                'status': new_status,
+                'reason': new_reason,
+                'student_id': attendance_record.student.id,
+                'student_name': attendance_record.student.full_name,
+                'session_id': attendance_record.session.id,
+                'course_code': attendance_record.session.course.code
+            }
+        )
+        
+        # Prepare response
+        response_serializer = AttendanceRecordSerializer(attendance_record)
+        return Response(
+            {
+                'success': True,
+                'message': 'Attendance record updated successfully',
+                'data': response_serializer.data,
+                'timestamp': timezone.now().isoformat()
+            },
+            status=status.HTTP_200_OK
+        )

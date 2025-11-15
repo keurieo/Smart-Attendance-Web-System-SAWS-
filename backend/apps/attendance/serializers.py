@@ -137,3 +137,44 @@ class AttendanceRecordSerializer(serializers.ModelSerializer):
             'status', 'distance_meters', 'reason', 'flagged_for_review'
         ]
         read_only_fields = ['id', 'marked_at']
+
+
+class AttendanceOverrideSerializer(serializers.Serializer):
+    """Serializer for admin attendance record override."""
+    status = serializers.ChoiceField(
+        choices=[
+            AttendanceRecord.PRESENT,
+            AttendanceRecord.ABSENT,
+            AttendanceRecord.REJECTED,
+            AttendanceRecord.PENDING
+        ],
+        required=True
+    )
+    reason = serializers.CharField(
+        required=True,
+        allow_blank=False,
+        trim_whitespace=True,
+        max_length=1000
+    )
+    
+    def validate_reason(self, value):
+        """Validate reason is provided and non-empty."""
+        if not value or len(value.strip()) == 0:
+            raise serializers.ValidationError(
+                "Reason must be provided and cannot be empty."
+            )
+        return value.strip()
+    
+    def validate_status(self, value):
+        """Validate status is one of the allowed values."""
+        allowed_statuses = [
+            AttendanceRecord.PRESENT,
+            AttendanceRecord.ABSENT,
+            AttendanceRecord.REJECTED,
+            AttendanceRecord.PENDING
+        ]
+        if value not in allowed_statuses:
+            raise serializers.ValidationError(
+                f"Status must be one of: {', '.join(allowed_statuses)}"
+            )
+        return value

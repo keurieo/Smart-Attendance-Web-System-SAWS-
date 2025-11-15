@@ -1,5 +1,6 @@
 from django.urls import path
+from .views import AttendanceReportView
 
 urlpatterns = [
-    # URLs will be added in later tasks
+    path('attendance/', AttendanceReportView.as_view(), name='attendance-report'),
 ]
