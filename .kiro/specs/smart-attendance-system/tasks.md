@@ -555,11 +555,14 @@
     - Handle camera errors and permission denial
     - _Requirements: 3.1_
 
-  - [ ] 17.2 Create manual code entry component
+  - [x] 17.2 Create manual code entry component
+
     - Implement ManualCodeEntry component with 6-digit input field
     - Validate input is 6 digits
     - Submit code to parent component
     - _Requirements: 3.1_
+
+
   - [ ] 17.3 Create scan page component
     - Implement ScanPage component with tabs for QR scan and manual entry
     - Trigger geolocation capture when page loads
@@ -567,8 +570,10 @@
     - Call attendance marking API with token and student location
     - Display result (success with distance, or rejection with reason)
     - Show error messages for location denial or API errors
+
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
-  - [ ] 17.4 Create attendance history component
+  - [x] 17.4 Create attendance history component
+
     - Implement AttendanceHistory component for student dashboard
     - Fetch and display student's attendance records
     - Show course name, date, time, status, and distance
