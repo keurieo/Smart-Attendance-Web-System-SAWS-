@@ -610,7 +610,8 @@
     - Validate reason is provided
     - Call override API and refresh attendance list
     - _Requirements: 7.1, 7.2, 7.3_
-  - [-] 18.4 Create audit log viewer component
+  - [x] 18.4 Create audit log viewer component
+
 
     - Implement AuditLog component with data table
     - Display audit entries with columns: timestamp, user, action, target, details
