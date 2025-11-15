@@ -32,6 +32,12 @@ A web-based attendance management system using QR codes and geolocation verifica
 
 ## Getting Started
 
+### Quick Start
+
+For detailed setup instructions, see:
+- **Development Setup**: [DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)
+- **Production Deployment**: [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)
+
 ### Prerequisites
 
 - Docker and Docker Compose
@@ -72,6 +78,8 @@ docker-compose exec backend python manage.py createsuperuser
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000/api
 - Admin Panel: http://localhost:8000/admin
+
+For more detailed instructions, troubleshooting, and production deployment, see [DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md).
 
 ## Development Setup
 
@@ -175,6 +183,43 @@ npm run format
 ├── nginx/                 # NGINX configuration
 └── docker-compose.yml     # Docker services configuration
 ```
+
+## Documentation
+
+### Setup and Deployment
+
+- **[DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)** - Complete development environment setup guide
+  - Local development with and without Docker
+  - Database migrations and initialization
+  - Environment configuration
+  - Troubleshooting common issues
+
+- **[PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)** - Production deployment guide
+  - Server setup and configuration
+  - SSL/TLS setup with Let's Encrypt
+  - Docker Compose production deployment
+  - Backup and restore procedures
+  - Monitoring and maintenance
+  - Scaling strategies
+
+### Quick References
+
+- **[DOCKER_QUICK_REFERENCE.md](DOCKER_QUICK_REFERENCE.md)** - Common Docker commands
+- **[DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)** - Docker-specific deployment details
+
+### Project Specifications
+
+- **[Requirements](.kiro/specs/smart-attendance-system/requirements.md)** - Detailed system requirements
+- **[Design](.kiro/specs/smart-attendance-system/design.md)** - System architecture and design
+- **[Tasks](.kiro/specs/smart-attendance-system/tasks.md)** - Implementation task list
+
+### Implementation Guides
+
+- **[backend/MODELS_IMPLEMENTATION.md](backend/MODELS_IMPLEMENTATION.md)** - Database models documentation
+- **[frontend/AUTHENTICATION_IMPLEMENTATION.md](frontend/AUTHENTICATION_IMPLEMENTATION.md)** - Frontend authentication
+- **[frontend/TEACHER_SESSION_INTERFACE_IMPLEMENTATION.md](frontend/TEACHER_SESSION_INTERFACE_IMPLEMENTATION.md)** - Teacher interface
+- **[frontend/STUDENT_QR_SCANNING_IMPLEMENTATION.md](frontend/STUDENT_QR_SCANNING_IMPLEMENTATION.md)** - Student scanning interface
+- **[frontend/ERROR_HANDLING_AND_VALIDATION_IMPLEMENTATION.md](frontend/ERROR_HANDLING_AND_VALIDATION_IMPLEMENTATION.md)** - Error handling
 
 ## API Documentation
 
