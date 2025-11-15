@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { storage } from '../utils/storage';
+import { parseError, retryRequest, isRetryableError } from '../utils/errorHandler';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
@@ -50,10 +51,8 @@ api.interceptors.response.use(
 
     // Handle network errors
     if (!error.response) {
-      return Promise.reject({
-        message: 'Network error. Please check your internet connection.',
-        isNetworkError: true,
-      });
+      const parsedError = parseError(error);
+      return Promise.reject(parsedError);
     }
 
     // If 401 and not already retried, try to refresh token
@@ -68,7 +67,7 @@ api.interceptors.response.use(
             return api(originalRequest);
           })
           .catch(err => {
-            return Promise.reject(err);
+            return Promise.reject(parseError(err));
           });
       }
 
@@ -81,7 +80,7 @@ api.interceptors.response.use(
         // No refresh token available, redirect to login
         storage.clearAll();
         window.location.href = '/login';
-        return Promise.reject(error);
+        return Promise.reject(parseError(error));
       }
 
       try {
@@ -111,21 +110,12 @@ api.interceptors.response.use(
         storage.clearAll();
         window.location.href = '/login';
         
-        return Promise.reject(refreshError);
+        return Promise.reject(parseError(refreshError));
       }
     }
 
-    // Handle other error responses
-    const errorResponse = {
-      status: error.response?.status,
-      message: error.response?.data?.message || 
-               error.response?.data?.detail || 
-               error.response?.data?.error ||
-               'An error occurred. Please try again.',
-      data: error.response?.data,
-    };
-
-    return Promise.reject(errorResponse);
+    // Parse and return structured error
+    return Promise.reject(parseError(error));
   }
 );
 
