@@ -35,7 +35,65 @@ class AttendanceSessionViewSet(viewsets.ModelViewSet):
         """Return appropriate permissions based on action."""
         if self.action == 'create':
             return [IsAuthenticated(), IsTeacher()]
+        elif self.action == 'retrieve':
+            return [IsAuthenticated(), IsTeacher()]
         return super().get_permissions()
+    
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Retrieve session details with list of attendance records.
+        
+        GET /api/attendance/sessions/:id
+        
+        Returns session details including:
+        - Session information (course, time, location, radius)
+        - List of attendance records with student names and statuses
+        """
+        session = self.get_object()
+        
+        # Validate teacher is assigned to session's course
+        if session.course.instructor != request.user:
+            return Response(
+                {
+                    'error_code': 'BIZ_001',
+                    'message': 'Teacher not assigned to this course',
+                    'details': {
+                        'session_id': session.id,
+                        'course_code': session.course.code
+                    }
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Serialize session
+        serializer = self.get_serializer(session)
+        session_data = serializer.data
+        
+        # Get attendance records for this session
+        attendance_records = AttendanceRecord.objects.filter(
+            session=session
+        ).select_related('student').order_by('-marked_at')
+        
+        # Serialize attendance records
+        attendance_serializer = AttendanceRecordSerializer(
+            attendance_records, 
+            many=True
+        )
+        
+        # Add attendance records to response
+        session_data['attendance_records'] = attendance_serializer.data
+        session_data['total_attendance'] = attendance_records.count()
+        session_data['present_count'] = attendance_records.filter(
+            status=AttendanceRecord.PRESENT
+        ).count()
+        session_data['absent_count'] = attendance_records.filter(
+            status=AttendanceRecord.ABSENT
+        ).count()
+        session_data['rejected_count'] = attendance_records.filter(
+            status=AttendanceRecord.REJECTED
+        ).count()
+        
+        return Response(session_data, status=status.HTTP_200_OK)
     
     @transaction.atomic
     def create(self, request, *args, **kwargs):

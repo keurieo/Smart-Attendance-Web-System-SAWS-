@@ -4,6 +4,43 @@ from apps.accounts.models import User
 from apps.academics.models import Course, Schedule
 
 
+class AttendanceSessionManager(models.Manager):
+    """Custom manager for AttendanceSession model."""
+    
+    def get_queryset(self):
+        """
+        Override get_queryset to automatically update expired sessions.
+        This ensures that whenever sessions are queried, their status is current.
+        """
+        from django.utils import timezone
+        
+        # Get the base queryset
+        queryset = super().get_queryset()
+        
+        # Update expired sessions (sessions where end_at has passed and status is still active)
+        current_time = timezone.now()
+        queryset.filter(
+            end_at__lt=current_time,
+            status=self.model.ACTIVE
+        ).update(status=self.model.EXPIRED)
+        
+        return queryset
+    
+    def active_sessions(self):
+        """Return only active sessions (not expired or cancelled)."""
+        from django.utils import timezone
+        current_time = timezone.now()
+        
+        return self.get_queryset().filter(
+            status=self.model.ACTIVE,
+            end_at__gte=current_time
+        )
+    
+    def expired_sessions(self):
+        """Return only expired sessions."""
+        return self.get_queryset().filter(status=self.model.EXPIRED)
+
+
 class AttendanceSession(models.Model):
     """Model representing an attendance session."""
     ACTIVE = 'active'
@@ -29,6 +66,8 @@ class AttendanceSession(models.Model):
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    objects = AttendanceSessionManager()
 
     class Meta:
         db_table = 'attendance_sessions'
@@ -42,6 +81,19 @@ class AttendanceSession(models.Model):
 
     def __str__(self):
         return f"Session for {self.course.code} at {self.start_at}"
+    
+    def is_expired(self):
+        """Check if this session has expired."""
+        from django.utils import timezone
+        return timezone.now() > self.end_at
+    
+    def update_status_if_expired(self):
+        """Update status to expired if end_at has passed."""
+        if self.status == self.ACTIVE and self.is_expired():
+            self.status = self.EXPIRED
+            self.save(update_fields=['status', 'updated_at'])
+            return True
+        return False
 
 
 class QRTokenManager(models.Manager):

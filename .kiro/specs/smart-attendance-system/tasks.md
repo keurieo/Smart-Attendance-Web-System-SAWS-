@@ -436,17 +436,22 @@
     - _Requirements: 10.5_
 -
 
-- [-] 14. Implement session management endpoints
+- [x] 14. Implement session management endpoints
 
 
 
-  - [ ] 14.1 Create session detail endpoint
+
+
+  - [x] 14.1 Create session detail endpoint
+
     - Implement GET /api/teacher/sessions/:id endpoint with IsTeacher permission
     - Validate teacher is assigned to session's course
     - Return session details with list of attendance records
     - Include student names and statuses
     - _Requirements: 2.1, 2.2_
-  - [ ] 14.2 Create session expiration logic
+
+  - [x] 14.2 Create session expiration logic
+
     - Implement automatic session status update to "expired" when end_at is reached
     - Can be implemented as database query filter or background task
     - _Requirements: 12.4_
@@ -456,56 +461,76 @@
     - Test session expiration logic
     - _Requirements: 2.1, 2.2, 12.4_
 
-- [ ] 15. Build React frontend authentication
+- [x] 15. Build React frontend authentication
 
-  - [ ] 15.1 Create authentication context and hooks
+
+
+
+
+  - [x] 15.1 Create authentication context and hooks
+
+
     - Implement AuthContext with user state, login, logout, and token refresh functions
     - Implement useAuth hook to access auth context
     - Store JWT tokens in localStorage
     - Implement automatic token refresh on expiration
     - _Requirements: 1.1, 1.4_
-  - [ ] 15.2 Create login page component
+  - [x] 15.2 Create login page component
+
+
     - Implement LoginForm component with email and password inputs
     - Call login API endpoint on form submission
     - Store tokens and user data in AuthContext
     - Redirect to role-appropriate dashboard on success
     - Display error messages on failure
     - _Requirements: 1.1_
-  - [ ] 15.3 Create protected route component
+  - [x] 15.3 Create protected route component
+
+
     - Implement ProtectedRoute wrapper component
     - Check authentication status from AuthContext
     - Redirect to login if not authenticated
     - Optionally check user role for role-specific routes
     - _Requirements: 1.2_
-  - [ ] 15.4 Set up API client with authentication
+  - [x] 15.4 Set up API client with authentication
+
+
     - Create Axios instance with base URL configuration
     - Add request interceptor to include JWT token in Authorization header
     - Add response interceptor to handle 401 errors and trigger token refresh
     - _Requirements: 1.1, 1.4_
+-
 
 - [ ] 16. Build teacher session creation interface
 
-  - [ ] 16.1 Create geolocation hook
+  - [x] 16.1 Create geolocation hook
+
+
     - Implement useGeolocation hook that wraps navigator.geolocation API
     - Request high accuracy location with timeout
     - Return location state (latitude, longitude, accuracy) and error state
     - Handle permission denial and errors
     - _Requirements: 2.2, 2.6_
-  - [ ] 16.2 Create session creation modal component
+  - [x] 16.2 Create session creation modal component
+
+
     - Implement CreateSessionModal with form fields: course selection, start_at, end_at, radius_meters
     - Trigger geolocation capture when modal opens
     - Display location capture status and accuracy
     - Validate form inputs (start before end, radius in range)
     - Call session creation API with teacher location
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
-  - [ ] 16.3 Create QR code viewer component
+  - [x] 16.3 Create QR code viewer component
+
+
     - Implement QRViewer component that displays QR code and 6-digit code
     - Use qrcode.react library to generate QR code from token
     - Display session countdown timer
     - Show session details (course, time window, radius)
     - Provide option to copy 6-digit code
     - _Requirements: 2.3, 2.5_
-  - [ ] 16.4 Create teacher dashboard with session list
+  - [-] 16.4 Create teacher dashboard with session list
+
     - Implement TeacherDashboard component
     - Display list of active and past sessions
     - Show "Create Session" button that opens CreateSessionModal
