@@ -29,15 +29,29 @@ EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'request_id': {
+            '()': 'apps.audit.logging_middleware.RequestIDFilter',
+        },
+    },
     'formatters': {
         'json': {
-            'format': '{"time": "%(asctime)s", "level": "%(levelname)s", "module": "%(module)s", "message": "%(message)s"}',
+            '()': 'apps.audit.formatters.JSONFormatter',
         },
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'json',
+            'filters': ['request_id'],
+        },
+        'file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': env('LOG_FILE_PATH', default='/var/log/attendance/app.log'),
+            'maxBytes': 10485760,  # 10MB
+            'backupCount': 10,
+            'formatter': 'json',
+            'filters': ['request_id'],
         },
     },
     'root': {
@@ -46,12 +60,22 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console', 'file'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['console', 'file'],
             'level': 'WARNING',
             'propagate': False,
         },
         'apps': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': 'INFO',
             'propagate': False,
         },

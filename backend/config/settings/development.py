@@ -24,16 +24,32 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'request_id': {
+            '()': 'apps.audit.logging_middleware.RequestIDFilter',
+        },
+    },
     'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
+        'colored': {
+            '()': 'apps.audit.formatters.ColoredConsoleFormatter',
+            'format': '{levelname} {asctime} {module}.{funcName} {message}',
             'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+        'json': {
+            '()': 'apps.audit.formatters.JSONFormatter',
         },
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+            'formatter': 'colored',
+            'filters': ['request_id'],
+        },
+        'json_console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'json',
+            'filters': ['request_id'],
         },
     },
     'root': {
@@ -42,6 +58,16 @@ LOGGING = {
     },
     'loggers': {
         'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.db.backends': {
             'handlers': ['console'],
             'level': 'INFO',
             'propagate': False,

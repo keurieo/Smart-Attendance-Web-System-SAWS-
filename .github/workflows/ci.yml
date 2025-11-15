@@ -6,8 +6,14 @@ on:
   pull_request:
     branches: [ main, develop ]
 
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE_NAME: ${{ github.repository }}/backend
+  FRONTEND_IMAGE_NAME: ${{ github.repository }}/frontend
+
 jobs:
-  backend-tests:
+  backend-lint-test:
+    name: Backend Linting and Tests
     runs-on: ubuntu-latest
     
     services:
@@ -36,12 +42,15 @@ jobs:
           - 6379:6379
     
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
     
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: 'backend/requirements/development.txt'
     
     - name: Install system dependencies
       run: |
@@ -54,47 +63,165 @@ jobs:
         pip install --upgrade pip
         pip install -r requirements/development.txt
     
-    - name: Run linting
+    - name: Run flake8 linting
       run: |
         cd backend
         flake8 apps config --max-line-length=120 --exclude=migrations
     
-    - name: Run tests
+    - name: Run pytest tests
       env:
         DATABASE_URL: postgis://test_user:test_password@localhost:5432/test_db
         REDIS_URL: redis://localhost:6379/0
         SECRET_KEY: test-secret-key
+        DJANGO_SETTINGS_MODULE: config.settings.development
       run: |
         cd backend
-        pytest
+        pytest --verbose --tb=short
   
-  frontend-tests:
+  frontend-lint-test:
+    name: Frontend Linting and Tests
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
     
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'frontend/package-lock.json'
     
     - name: Install dependencies
       run: |
         cd frontend
         npm ci
     
-    - name: Run linting
+    - name: Run ESLint linting
       run: |
         cd frontend
         npm run lint
     
-    - name: Run tests
+    - name: Run Jest tests
       run: |
         cd frontend
-        npm test -- --watchAll=false
+        npm test -- --watchAll=false --coverage
     
-    - name: Build
+    - name: Build production bundle
       run: |
         cd frontend
         npm run build
+  
+  build-backend:
+    name: Build Backend Docker Image
+    runs-on: ubuntu-latest
+    needs: backend-lint-test
+    if: github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata for Docker
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Backend Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./backend
+        file: ./backend/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:buildcache
+        cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:buildcache,mode=max
+  
+  build-frontend:
+    name: Build Frontend Docker Image
+    runs-on: ubuntu-latest
+    needs: frontend-lint-test
+    if: github.event_name == 'push'
+    
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata for Docker
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+    
+    - name: Build and push Frontend Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./frontend
+        file: ./frontend/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:buildcache
+        cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:buildcache,mode=max
+  
+  deploy:
+    name: Deploy to Registry
+    runs-on: ubuntu-latest
+    needs: [build-backend, build-frontend]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Deployment notification
+      run: |
+        echo "✅ Docker images successfully built and pushed to registry"
+        echo "Backend image: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}"
+        echo "Frontend image: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}"
+        echo ""
+        echo "Images are tagged with:"
+        echo "  - Branch name: ${{ github.ref_name }}"
+        echo "  - Commit SHA: ${{ github.sha }}"
+        echo "  - Latest (main branch only)"
+        echo ""
+        echo "To deploy these images, pull them from the registry and run with docker-compose or your orchestration platform."
