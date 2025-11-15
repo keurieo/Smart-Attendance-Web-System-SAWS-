@@ -141,10 +141,203 @@ import { MapPreview } from '../components/shared';
 />
 ```
 
+## Form Components
+
+### FormInput
+
+A reusable text input component with built-in validation display.
+
+**Props:**
+- `label` (string): Input label
+- `name` (string, required): Input name
+- `type` (string, default: 'text'): Input type
+- `value` (any, required): Input value
+- `onChange` (function, required): Change handler
+- `onBlur` (function): Blur handler
+- `error` (string): Error message
+- `touched` (boolean): Whether field has been touched
+- `required` (boolean, default: false): Show required indicator
+- `disabled` (boolean, default: false): Disable input
+- `placeholder` (string): Placeholder text
+
+**Example:**
+```jsx
+import { FormInput } from '../components/shared';
+
+<FormInput
+  label="Email"
+  name="email"
+  type="email"
+  value={formData.email}
+  onChange={handleChange}
+  onBlur={handleBlur}
+  error={errors.email}
+  touched={touched.email}
+  required
+/>
+```
+
+### FormSelect
+
+A reusable select dropdown component with validation display.
+
+**Props:**
+- `label` (string): Select label
+- `name` (string, required): Select name
+- `value` (any, required): Selected value
+- `onChange` (function, required): Change handler
+- `onBlur` (function): Blur handler
+- `error` (string): Error message
+- `touched` (boolean): Whether field has been touched
+- `options` (array, required): Array of `{ value, label, disabled }` objects
+- `placeholder` (string): Placeholder option text
+- `required` (boolean, default: false): Show required indicator
+- `disabled` (boolean, default: false): Disable select
+
+**Example:**
+```jsx
+import { FormSelect } from '../components/shared';
+
+<FormSelect
+  label="Role"
+  name="role"
+  value={formData.role}
+  onChange={handleChange}
+  options={[
+    { value: 'admin', label: 'Administrator' },
+    { value: 'teacher', label: 'Teacher' },
+    { value: 'student', label: 'Student' },
+  ]}
+  error={errors.role}
+  touched={touched.role}
+  required
+/>
+```
+
+### FormTextarea
+
+A reusable textarea component with validation display.
+
+**Props:**
+- `label` (string): Textarea label
+- `name` (string, required): Textarea name
+- `value` (any, required): Textarea value
+- `onChange` (function, required): Change handler
+- `onBlur` (function): Blur handler
+- `error` (string): Error message
+- `touched` (boolean): Whether field has been touched
+- `rows` (number, default: 4): Number of rows
+- `required` (boolean, default: false): Show required indicator
+- `disabled` (boolean, default: false): Disable textarea
+- `placeholder` (string): Placeholder text
+
+## Loading Components
+
+### LoadingSpinner
+
+A simple animated spinner component.
+
+**Props:**
+- `size` (string, default: 'md'): Spinner size ('sm', 'md', 'lg', 'xl')
+- `color` (string, default: 'blue'): Spinner color ('blue', 'white', 'gray', 'green', 'red')
+
+**Example:**
+```jsx
+import { LoadingSpinner } from '../components/shared';
+
+<LoadingSpinner size="lg" color="blue" />
+```
+
+### LoadingButton
+
+A button component with integrated loading state.
+
+**Props:**
+- `loading` (boolean, default: false): Show loading state
+- `disabled` (boolean, default: false): Disable button
+- `variant` (string, default: 'primary'): Button style ('primary', 'secondary', 'success', 'danger', 'outline')
+- `size` (string, default: 'md'): Button size ('sm', 'md', 'lg')
+- `fullWidth` (boolean, default: false): Full width button
+- `loadingText` (string, default: 'Loading...'): Text to show when loading
+- `type` (string, default: 'button'): Button type
+- `onClick` (function): Click handler
+
+**Example:**
+```jsx
+import { LoadingButton } from '../components/shared';
+
+<LoadingButton
+  loading={isSubmitting}
+  onClick={handleSubmit}
+  variant="primary"
+  size="md"
+>
+  Submit
+</LoadingButton>
+```
+
+### LoadingOverlay
+
+A full-screen or container overlay with loading indicator.
+
+**Props:**
+- `loading` (boolean, default: false): Show overlay
+- `message` (string, default: 'Loading...'): Loading message
+- `fullScreen` (boolean, default: false): Cover entire screen vs container
+
+**Example:**
+```jsx
+import { LoadingOverlay } from '../components/shared';
+
+<div className="relative">
+  <LoadingOverlay loading={isLoading} message="Fetching data..." />
+  {/* Your content */}
+</div>
+```
+
+### SkeletonLoader
+
+Skeleton loading placeholders for various content types.
+
+**Components:**
+- `SkeletonLoader.Text`: Text placeholder
+- `SkeletonLoader.Card`: Card placeholder
+- `SkeletonLoader.Table`: Table placeholder
+- `SkeletonLoader.Avatar`: Avatar placeholder
+- `SkeletonLoader.Button`: Button placeholder
+
+**Example:**
+```jsx
+import SkeletonLoader from '../components/shared/SkeletonLoader';
+
+{isLoading ? (
+  <>
+    <SkeletonLoader.Card />
+    <SkeletonLoader.Table rows={5} columns={4} />
+  </>
+) : (
+  <YourContent />
+)}
+```
+
 ## Import
 
 All components can be imported from the shared directory:
 
 ```jsx
-import { DataTable, Modal, Toast, useToast, ToastProvider, MapPreview } from './components/shared';
+import { 
+  DataTable, 
+  Modal, 
+  Toast, 
+  useToast, 
+  ToastProvider, 
+  MapPreview,
+  FormInput,
+  FormSelect,
+  FormTextarea,
+  LoadingSpinner,
+  LoadingButton,
+  LoadingOverlay,
+  SkeletonLoader
+} from './components/shared';
 ```
