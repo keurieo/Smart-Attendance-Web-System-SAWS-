@@ -601,7 +601,8 @@
     - Add enrollment management interface (add/remove students)
     - Call admin course management APIs
     - _Requirements: 6.1, 6.2_
-  - [-] 18.3 Create attendance override component
+  - [x] 18.3 Create attendance override component
+
 
     - Implement AttendanceOverride modal component
     - Display current attendance record details
@@ -609,7 +610,8 @@
     - Validate reason is provided
     - Call override API and refresh attendance list
     - _Requirements: 7.1, 7.2, 7.3_
-  - [ ] 18.4 Create audit log viewer component
+  - [-] 18.4 Create audit log viewer component
+
     - Implement AuditLog component with data table
     - Display audit entries with columns: timestamp, user, action, target, details
     - Implement filtering by user, date range, action type
