@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: smart-attendance-backend
+    env: python
+    region: oregon
+    buildCommand: pip install -r backend/requirements/production.txt && python backend/manage.py collectstatic --noinput && python backend/manage.py migrate
+    startCommand: cd backend && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 4
+    healthCheckPath: /api/health/
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.production
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_ALLOWED_HOSTS
+        value: .onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smart-attendance-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: smart-attendance-redis
+          property: connectionString
+
+databases:
+  - name: smart-attendance-db
+    databaseName: smart_attendance
+    user: smart_attendance_user
+    plan: starter
+    postgresMajorVersion: 14
+    ipAllowList: []
+
+  - name: smart-attendance-redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []

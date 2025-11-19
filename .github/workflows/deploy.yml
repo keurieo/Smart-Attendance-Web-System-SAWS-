@@ -1,0 +1,58 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to Railway
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Backend auto-deploys via Railway GitHub integration"
+          echo "No manual deployment needed"
+      
+      - name: Notify deployment
+        run: |
+          echo "✅ Backend deployment triggered on Railway"
+
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to Vercel
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Frontend auto-deploys via Vercel GitHub integration"
+          echo "No manual deployment needed"
+      
+      - name: Notify deployment
+        run: |
+          echo "✅ Frontend deployment triggered on Vercel"
+
+  health-check:
+    name: Health Check
+    needs: [deploy-backend, deploy-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for deployment
+        run: sleep 60
+      
+      - name: Check backend health
+        run: |
+          echo "Check your backend health endpoint manually:"
+          echo "https://your-backend.railway.app/api/health/"
+      
+      - name: Check frontend
+        run: |
+          echo "Check your frontend manually:"
+          echo "https://your-app.vercel.app"

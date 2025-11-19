@@ -37,6 +37,7 @@ A web-based attendance management system using QR codes and geolocation verifica
 For detailed setup instructions, see:
 - **Development Setup**: [DEVELOPMENT_SETUP.md](DEVELOPMENT_SETUP.md)
 - **Production Deployment**: [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)
+- **Deploy to Vercel/Railway**: [QUICK_DEPLOY.md](QUICK_DEPLOY.md) ⚡ (15 minutes)
 
 ### Prerequisites
 
