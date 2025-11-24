@@ -6,6 +6,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from rest_framework_simplejwt.views import TokenRefreshView
+from apps.accounts.urls import admin_urlpatterns as accounts_admin_urls
 
 # Customize admin site
 admin.site.site_header = getattr(settings, 'ADMIN_SITE_HEADER', 'Smart Attendance System')
@@ -23,7 +24,7 @@ urlpatterns = [
     path('api/', include('apps.academics.urls')),  # Includes teacher/ and admin/ prefixes
     path('api/', include('apps.attendance.urls')),  # Includes teacher/, student/, admin/ prefixes
     path('api/', include('apps.reports.urls')),  # Includes teacher/ prefix
-    path('api/admin/', include('apps.accounts.admin_urlpatterns')),  # Admin user management
+    path('api/admin/', include(accounts_admin_urls)),  # Admin user management
     path('api/admin/', include('apps.audit.urls')),  # Admin audit logs
 ]
 

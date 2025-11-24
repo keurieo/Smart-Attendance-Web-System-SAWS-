@@ -1,6 +1,7 @@
 from rest_framework import generics, filters
 from rest_framework.pagination import PageNumberPagination
 from django_filters import rest_framework as django_filters
+from django.utils.dateparse import parse_datetime
 from apps.accounts.permissions import IsAdmin
 from .models import AuditLog
 from .serializers import AuditLogSerializer
@@ -16,14 +17,30 @@ class AuditLogPagination(PageNumberPagination):
 class AuditLogFilter(django_filters.FilterSet):
     """Filter class for audit log queries."""
     user_id = django_filters.NumberFilter(field_name='performed_by__id')
-    date_from = django_filters.DateTimeFilter(field_name='performed_at', lookup_expr='gte')
-    date_to = django_filters.DateTimeFilter(field_name='performed_at', lookup_expr='lte')
+    date_from = django_filters.CharFilter(method='filter_date_from')
+    date_to = django_filters.CharFilter(method='filter_date_to')
     action = django_filters.CharFilter(field_name='action', lookup_expr='icontains')
     target_table = django_filters.CharFilter(field_name='target_table', lookup_expr='iexact')
 
     class Meta:
         model = AuditLog
         fields = ['user_id', 'date_from', 'date_to', 'action', 'target_table']
+    
+    def filter_date_from(self, queryset, name, value):
+        """Filter logs from the specified date (inclusive)."""
+        if value:
+            date = parse_datetime(value)
+            if date:
+                return queryset.filter(performed_at__gte=date)
+        return queryset
+    
+    def filter_date_to(self, queryset, name, value):
+        """Filter logs until the specified date (inclusive)."""
+        if value:
+            date = parse_datetime(value)
+            if date:
+                return queryset.filter(performed_at__lte=date)
+        return queryset
 
 
 class AuditLogListView(generics.ListAPIView):
