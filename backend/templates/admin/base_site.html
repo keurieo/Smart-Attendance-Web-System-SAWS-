@@ -13,7 +13,28 @@
 
 {% block extrastyle %}
     {{ block.super }}
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Zento Theme Stylesheets -->
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/zento-theme.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/components.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/navigation.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/responsive.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
 {% endblock %}
 
 {% block nav-global %}{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'admin/js/navigation.js' %}" defer></script>
+{% endblock %}
+
+{% block header %}
+    {% include "admin/includes/sidebar.html" %}
+    {% include "admin/includes/header.html" %}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% comment %}
+Metric Card Component
+Usage: {% include "admin/includes/metric_card.html" with title="Total Users" value="1,247" percentage=87 trend="up" change="+12%" icon_class="icon--primary" %}
+{% endcomment %}
+
+<div class="metric-card">
+  <div class="metric-card__header">
+    <div class="metric-card__icon {{ icon_class|default:'metric-card__icon--primary' }}">
+      {% if icon %}
+        {{ icon|safe }}
+      {% else %}
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      {% endif %}
+    </div>
+    <h3 class="metric-card__title">{{ title }}</h3>
+  </div>
+  
+  <div class="metric-card__body">
+    <div class="metric-card__value">{{ value }}</div>
+    
+    {% if percentage is not None %}
+    <div class="metric-card__chart">
+      <svg class="circular-progress" viewBox="0 0 100 100">
+        <circle class="progress-bg" cx="50" cy="50" r="45"></circle>
+        <circle 
+          class="progress-bar {{ progress_class|default:'' }}" 
+          cx="50" 
+          cy="50" 
+          r="45"
+          stroke-dasharray="282.7"
+          stroke-dashoffset="{{ 282.7|floatformat:1|add:'-'|add:percentage|multiply:2.827|floatformat:1 }}"
+        ></circle>
+      </svg>
+      <div class="progress-text">{{ percentage|floatformat:0 }}%</div>
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="metric-card__footer">
+    {% if trend and change %}
+    <span class="metric-trend metric-trend--{{ trend }}">
+      {% if trend == "up" %}
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      {% elif trend == "down" %}
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
+      {% else %}
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14" />
+        </svg>
+      {% endif %}
+      {{ change }}
+    </span>
+    {% endif %}
+    
+    {% if footer_text %}
+    <span class="text-gray-500">{{ footer_text }}</span>
+    {% endif %}
+  </div>
+</div>

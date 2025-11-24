@@ -1,0 +1,124 @@
+{% load static %}
+
+<aside class="admin-sidebar" id="adminSidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo-container">
+      <svg class="sidebar-logo" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="8" fill="url(#gradient)"/>
+        <path d="M16 8L22 12V20L16 24L10 20V12L16 8Z" fill="white" opacity="0.9"/>
+        <defs>
+          <linearGradient id="gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#3b82f6"/>
+            <stop offset="1" stop-color="#06b6d4"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <h2 class="sidebar-title">Smart Attendance</h2>
+    </div>
+  </div>
+  
+  <nav class="sidebar-nav">
+    <!-- Main Section -->
+    <div class="nav-section">
+      <h3 class="nav-section__title">Main</h3>
+      <ul class="nav-list">
+        <li class="nav-item {% if request.path == '/admin/' %}nav-item--active{% endif %}">
+          <a href="{% url 'admin:index' %}" class="nav-link">
+            <svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 4C3 3.44772 3.44772 3 4 3H7C7.55228 3 8 3.44772 8 4V7C8 7.55228 7.55228 8 7 8H4C3.44772 8 3 7.55228 3 7V4Z" fill="currentColor"/>
+              <path d="M3 13C3 12.4477 3.44772 12 4 12H7C7.55228 12 8 12.4477 8 13V16C8 16.5523 7.55228 17 7 17H4C3.44772 17 3 16.5523 3 16V13Z" fill="currentColor"/>
+              <path d="M12 4C12 3.44772 12.4477 3 13 3H16C16.5523 3 17 3.44772 17 4V7C17 7.55228 16.5523 8 16 8H13C12.4477 8 12 7.55228 12 7V4Z" fill="currentColor"/>
+              <path d="M13 12C12.4477 12 12 12.4477 12 13V16C12 16.5523 12.4477 17 13 17H16C16.5523 17 17 16.5523 17 16V13C17 12.4477 16.5523 12 16 12H13Z" fill="currentColor"/>
+            </svg>
+            <span class="nav-text">Dashboard</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Management Section -->
+    <div class="nav-section">
+      <h3 class="nav-section__title">Management</h3>
+      <ul class="nav-list">
+        <li class="nav-item {% if 'accounts/user' in request.path %}nav-item--active{% endif %}">
+          <a href="{% url 'admin:accounts_user_changelist' %}" class="nav-link">
+            <svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 6C9 7.65685 7.65685 9 6 9C4.34315 9 3 7.65685 3 6C3 4.34315 4.34315 3 6 3C7.65685 3 9 4.34315 9 6Z" fill="currentColor"/>
+              <path d="M17 6C17 7.65685 15.6569 9 14 9C12.3431 9 11 7.65685 11 6C11 4.34315 12.3431 3 14 3C15.6569 3 17 4.34315 17 6Z" fill="currentColor"/>
+              <path d="M12.9291 17C12.9758 16.6734 13 16.3395 13 16C13 14.3648 12.4393 12.8606 11.4998 11.6691C12.2352 11.2435 13.0892 11 14 11C16.7614 11 19 13.2386 19 16V17H12.9291Z" fill="currentColor"/>
+              <path d="M6 11C8.76142 11 11 13.2386 11 16V17H1V16C1 13.2386 3.23858 11 6 11Z" fill="currentColor"/>
+            </svg>
+            <span class="nav-text">Users</span>
+          </a>
+        </li>
+        
+        <li class="nav-item {% if 'academics/course' in request.path %}nav-item--active{% endif %}">
+          <a href="{% url 'admin:academics_course_changelist' %}" class="nav-link">
+            <svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.394 2.08975C10.1472 1.96692 9.85282 1.96692 9.60598 2.08975L2.10598 5.83975C1.428 6.17866 1.428 7.15541 2.10598 7.49432L9.60598 11.2443C9.85282 11.3671 10.1472 11.3671 10.394 11.2443L17.894 7.49432C18.572 7.15541 18.572 6.17866 17.894 5.83975L10.394 2.08975Z" fill="currentColor"/>
+              <path d="M3.5 9.21922L9.60598 12.0742C9.85282 12.197 10.1472 12.197 10.394 12.0742L16.5 9.21922V13.5C16.5 14.3284 15.8284 15 15 15H5C4.17157 15 3.5 14.3284 3.5 13.5V9.21922Z" fill="currentColor"/>
+            </svg>
+            <span class="nav-text">Courses</span>
+          </a>
+        </li>
+        
+        <li class="nav-item {% if 'academics/enrollment' in request.path %}nav-item--active{% endif %}">
+          <a href="{% url 'admin:academics_enrollment_changelist' %}" class="nav-link">
+            <svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M6 2C5.44772 2 5 2.44772 5 3V4H4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H16C17.1046 18 18 17.1046 18 16V6C18 4.89543 17.1046 4 16 4H15V3C15 2.44772 14.5523 2 14 2C13.4477 2 13 2.44772 13 3V4H7V3C7 2.44772 6.55228 2 6 2ZM6 7C5.44772 7 5 7.44772 5 8C5 8.55228 5.44772 9 6 9H14C14.5523 9 15 8.55228 15 8C15 7.44772 14.5523 7 14 7H6Z" fill="currentColor"/>
+            </svg>
+            <span class="nav-text">Enrollments</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Attendance Section -->
+    <div class="nav-section">
+      <h3 class="nav-section__title">Attendance</h3>
+      <ul class="nav-list">
+        <li class="nav-item {% if 'attendance/session' in request.path %}nav-item--active{% endif %}">
+          <a href="{% url 'admin:attendance_session_changelist' %}" class="nav-link">
+            <svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 6C11 5.44772 10.5523 5 10 5C9.44772 5 9 5.44772 9 6V10C9 10.2652 9.10536 10.5196 9.29289 10.7071L12.1213 13.5355C12.5118 13.9261 13.145 13.9261 13.5355 13.5355C13.9261 13.145 13.9261 12.5118 13.5355 12.1213L11 9.58579V6Z" fill="currentColor"/>
+            </svg>
+            <span class="nav-text">Sessions</span>
+          </a>
+        </li>
+        
+        <li class="nav-item {% if 'attendance/attendancerecord' in request.path %}nav-item--active{% endif %}">
+          <a href="{% url 'admin:attendance_attendancerecord_changelist' %}" class="nav-link">
+            <svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M6 2C5.44772 2 5 2.44772 5 3V4H4C2.89543 4 2 4.89543 2 6V16C2 17.1046 2.89543 18 4 18H16C17.1046 18 18 17.1046 18 16V6C18 4.89543 17.1046 4 16 4H15V3C15 2.44772 14.5523 2 14 2C13.4477 2 13 2.44772 13 3V4H7V3C7 2.44772 6.55228 2 6 2ZM13.7071 9.29289C14.0976 9.68342 14.0976 10.3166 13.7071 10.7071L9.70711 14.7071C9.31658 15.0976 8.68342 15.0976 8.29289 14.7071L6.29289 12.7071C5.90237 12.3166 5.90237 11.6834 6.29289 11.2929C6.68342 10.9024 7.31658 10.9024 7.70711 11.2929L9 12.5858L12.2929 9.29289C12.6834 8.90237 13.3166 8.90237 13.7071 9.29289Z" fill="currentColor"/>
+            </svg>
+            <span class="nav-text">Records</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- System Section -->
+    <div class="nav-section">
+      <h3 class="nav-section__title">System</h3>
+      <ul class="nav-list">
+        <li class="nav-item {% if 'audit/auditlog' in request.path %}nav-item--active{% endif %}">
+          <a href="{% url 'admin:audit_auditlog_changelist' %}" class="nav-link">
+            <svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M3 5C3 3.89543 3.89543 3 5 3H15C16.1046 3 17 3.89543 17 5V15C17 16.1046 16.1046 17 15 17H5C3.89543 17 3 16.1046 3 15V5ZM7 7C6.44772 7 6 7.44772 6 8C6 8.55228 6.44772 9 7 9H13C13.5523 9 14 8.55228 14 8C14 7.44772 13.5523 7 13 7H7ZM7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13H10C10.5523 13 11 12.5523 11 12C11 11.4477 10.5523 11 10 11H7Z" fill="currentColor"/>
+            </svg>
+            <span class="nav-text">Audit Logs</span>
+          </a>
+        </li>
+        
+        <li class="nav-item">
+          <a href="{% url 'admin:index' %}#settings" class="nav-link">
+            <svg class="nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M11.49 3.17C11.11 1.61 8.89 1.61 8.51 3.17C8.37 3.73 7.79 4.08 7.23 3.95C5.68 3.57 4.42 4.83 4.8 6.38C4.93 6.94 4.58 7.52 4.02 7.66C2.46 8.04 2.46 10.26 4.02 10.64C4.58 10.78 4.93 11.36 4.8 11.92C4.42 13.47 5.68 14.73 7.23 14.35C7.79 14.22 8.37 14.57 8.51 15.13C8.89 16.69 11.11 16.69 11.49 15.13C11.63 14.57 12.21 14.22 12.77 14.35C14.32 14.73 15.58 13.47 15.2 11.92C15.07 11.36 15.42 10.78 15.98 10.64C17.54 10.26 17.54 8.04 15.98 7.66C15.42 7.52 15.07 6.94 15.2 6.38C15.58 4.83 14.32 3.57 12.77 3.95C12.21 4.08 11.63 3.73 11.49 3.17ZM10 13C11.6569 13 13 11.6569 13 10C13 8.34315 11.6569 7 10 7C8.34315 7 7 8.34315 7 10C7 11.6569 8.34315 13 10 13Z" fill="currentColor"/>
+            </svg>
+            <span class="nav-text">Settings</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</aside>

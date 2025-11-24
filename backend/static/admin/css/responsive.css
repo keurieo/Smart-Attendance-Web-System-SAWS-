@@ -1,0 +1,450 @@
+/**
+ * Responsive Styles
+ * Media queries for tablet and mobile devices
+ */
+
+/* ============================================
+   Tablet (768px - 1023px)
+   ============================================ */
+
+@media (max-width: 1023px) {
+  /* Metrics Grid */
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+  }
+
+  /* Charts Grid */
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  /* Dashboard Container */
+  .dashboard-container {
+    padding: var(--space-4);
+  }
+
+  /* Typography adjustments */
+  .dashboard-title {
+    font-size: var(--text-2xl);
+  }
+
+  .metric-card__value {
+    font-size: var(--text-3xl);
+  }
+
+  /* Stats Bar */
+  .stats-bar {
+    flex-wrap: wrap;
+    gap: var(--space-4);
+  }
+
+  /* Quick Actions */
+  .quick-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ============================================
+   Mobile (<768px)
+   ============================================ */
+
+@media (max-width: 767px) {
+  /* Root font size adjustment */
+  html {
+    font-size: 14px;
+  }
+
+  /* Metrics Grid - Single Column */
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  /* Metric Card */
+  .metric-card {
+    padding: var(--space-4);
+  }
+
+  .metric-card__body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .metric-card__value {
+    font-size: var(--text-2xl);
+  }
+
+  .metric-card__chart {
+    width: 60px;
+    height: 60px;
+  }
+
+  /* Charts Grid */
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .chart-card {
+    padding: var(--space-4);
+  }
+
+  .chart-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .chart-card__filters {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filter-btn {
+    flex: 1;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+
+  .chart-card__body {
+    min-height: 250px;
+  }
+
+  /* Dashboard Container */
+  .dashboard-container {
+    padding: var(--space-3);
+  }
+
+  .dashboard-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .dashboard-title {
+    font-size: var(--text-xl);
+  }
+
+  .dashboard-subtitle {
+    font-size: var(--text-sm);
+  }
+
+  /* Stats Bar */
+  .stats-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .stat-item {
+    width: 100%;
+  }
+
+  .stat-value {
+    font-size: var(--text-xl);
+  }
+
+  /* Quick Actions */
+  .quick-actions {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .quick-action-card {
+    padding: var(--space-3);
+  }
+
+  /* Activity Section */
+  .activity-section {
+    padding: var(--space-4);
+  }
+
+  .activity-item {
+    padding: var(--space-3);
+  }
+
+  .activity-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .activity-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Card Components */
+  .card {
+    padding: var(--space-4);
+  }
+
+  .card-title {
+    font-size: var(--text-lg);
+  }
+
+  /* Buttons */
+  .btn {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--text-xs);
+  }
+
+  /* Form Components */
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  /* Modal */
+  .modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: var(--space-4);
+  }
+
+  .modal-body {
+    max-height: calc(95vh - 120px);
+  }
+
+  /* Heatmap */
+  .heatmap-grid {
+    gap: 1px;
+  }
+
+  /* Dropdown Menu */
+  .dropdown-menu {
+    min-width: 180px;
+  }
+
+  /* Touch Targets - Ensure minimum 44px */
+  .btn-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .form-checkbox,
+  .form-radio {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ============================================
+   Small Mobile (<480px)
+   ============================================ */
+
+@media (max-width: 479px) {
+  /* Further reduce spacing */
+  .dashboard-container {
+    padding: var(--space-2);
+  }
+
+  .metrics-grid,
+  .charts-grid,
+  .quick-actions {
+    gap: var(--space-3);
+  }
+
+  /* Metric Card */
+  .metric-card {
+    padding: var(--space-3);
+  }
+
+  .metric-card__icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .metric-card__icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .metric-card__value {
+    font-size: var(--text-xl);
+  }
+
+  .metric-card__chart {
+    width: 50px;
+    height: 50px;
+  }
+
+  .progress-text {
+    font-size: var(--text-sm);
+  }
+
+  /* Chart Card */
+  .chart-card {
+    padding: var(--space-3);
+  }
+
+  .chart-card__title {
+    font-size: var(--text-lg);
+  }
+
+  .chart-card__body {
+    min-height: 200px;
+  }
+
+  /* Typography */
+  .dashboard-title {
+    font-size: var(--text-lg);
+  }
+
+  h1 { font-size: var(--text-2xl); }
+  h2 { font-size: var(--text-xl); }
+  h3 { font-size: var(--text-lg); }
+  h4 { font-size: var(--text-base); }
+
+  /* Activity Section */
+  .activity-section {
+    padding: var(--space-3);
+  }
+
+  .activity-header {
+    margin-bottom: var(--space-4);
+  }
+
+  .activity-title {
+    font-size: var(--text-lg);
+  }
+
+  .activity-list {
+    gap: var(--space-3);
+  }
+
+  .activity-item {
+    gap: var(--space-3);
+  }
+
+  /* Quick Actions */
+  .quick-action-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .quick-action-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .quick-action-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* ============================================
+   Landscape Mobile
+   ============================================ */
+
+@media (max-width: 767px) and (orientation: landscape) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .chart-card__body {
+    min-height: 200px;
+  }
+
+  .modal {
+    max-height: 90vh;
+  }
+
+  .modal-body {
+    max-height: calc(90vh - 120px);
+  }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+
+@media print {
+  /* Hide interactive elements */
+  .btn,
+  .dropdown,
+  .modal-backdrop,
+  .modal {
+    display: none !important;
+  }
+
+  /* Adjust colors for print */
+  body {
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  .card,
+  .metric-card,
+  .chart-card,
+  .activity-section {
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure charts are visible */
+  .chart-card__body {
+    min-height: auto;
+  }
+
+  /* Remove hover effects */
+  *:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ============================================
+   High Contrast Mode
+   ============================================ */
+
+@media (prefers-contrast: high) {
+  :root {
+    --gray-100: #e0e0e0;
+    --gray-200: #c0c0c0;
+    --gray-300: #a0a0a0;
+  }
+
+  .card,
+  .metric-card,
+  .chart-card {
+    border: 2px solid var(--gray-300);
+  }
+
+  .btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .spinner {
+    animation: none;
+    border-top-color: var(--primary-600);
+  }
+
+  .skeleton {
+    animation: none;
+    background: var(--gray-200);
+  }
+}
