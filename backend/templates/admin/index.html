@@ -1,0 +1,194 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans 'Dashboard' %} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div>
+      <h1 class="dashboard-title">Dashboard</h1>
+      <p class="dashboard-subtitle">Welcome back, {{ user.get_full_name|default:user.username }}</p>
+    </div>
+    <div class="dashboard-actions">
+      <button class="btn btn-secondary">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M4 2C2.89543 2 2 2.89543 2 4V6C2 7.10457 2.89543 8 4 8H6C7.10457 8 8 7.10457 8 6V4C8 2.89543 7.10457 2 6 2H4ZM4 10C2.89543 10 2 10.8954 2 12V16C2 17.1046 2.89543 18 4 18H6C7.10457 18 8 17.1046 8 16V12C8 10.8954 7.10457 10 6 10H4ZM12 4C12 2.89543 12.8954 2 14 2H16C17.1046 2 18 2.89543 18 4V6C18 7.10457 17.1046 8 16 8H14C12.8954 8 12 7.10457 12 6V4ZM14 10C12.8954 10 12 10.8954 12 12V16C12 17.1046 12.8954 18 14 18H16C17.1046 18 18 17.1046 18 16V12C18 10.8954 17.1046 10 16 10H14Z" fill="currentColor"/>
+        </svg>
+        Customize
+      </button>
+      <a href="{% url 'admin:accounts_user_add' %}" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M10 3C10.5523 3 11 3.44772 11 4V9H16C16.5523 9 17 9.44772 17 10C17 10.5523 16.5523 11 16 11H11V16C11 16.5523 10.5523 17 10 17C9.44772 17 9 16.5523 9 16V11H4C3.44772 11 3 10.5523 3 10C3 9.44772 3.44772 9 4 9H9V4C9 3.44772 9.44772 3 10 3Z" fill="currentColor"/>
+        </svg>
+        Add User
+      </a>
+    </div>
+  </div>
+
+  <!-- Metrics Grid -->
+  <div class="metrics-grid">
+    {% include "admin/includes/metric_card.html" with title="Total Users" value=metrics.total_users icon="users" trend="+12%" trend_up=True %}
+    {% include "admin/includes/metric_card.html" with title="Active Sessions" value=metrics.active_sessions icon="clock" trend="+5%" trend_up=True %}
+    {% include "admin/includes/metric_card.html" with title="Attendance Rate" value=metrics.attendance_rate percentage=True icon="check" trend="-2%" trend_up=False %}
+    {% include "admin/includes/metric_card.html" with title="Total Courses" value=metrics.total_courses icon="book" trend="+3" trend_up=True %}
+  </div>
+
+  <!-- Charts Section -->
+  <div class="charts-section">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <h3 class="chart-title">Attendance Trend</h3>
+          <p class="chart-subtitle">Last 30 days</p>
+        </div>
+        <div class="chart-filters">
+          <button class="filter-btn active" data-range="week">Week</button>
+          <button class="filter-btn" data-range="month">Month</button>
+          <button class="filter-btn" data-range="year">Year</button>
+        </div>
+      </div>
+      <div class="chart-body">
+        <canvas id="attendanceTrendChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-header">
+        <div>
+          <h3 class="chart-title">Activity Heatmap</h3>
+          <p class="chart-subtitle">Hourly activity distribution</p>
+        </div>
+      </div>
+      <div class="chart-body">
+        <div id="activityHeatmap" class="heatmap-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity Section -->
+  <div class="recent-activity-section">
+    <div class="activity-card">
+      <div class="card-header">
+        <h3 class="card-title">Recent Sessions</h3>
+        <a href="{% url 'admin:attendance_session_changelist' %}" class="view-all-link">View All</a>
+      </div>
+      <div class="activity-list">
+        {% if recent_sessions %}
+          {% for session in recent_sessions %}
+            <div class="activity-item">
+              <div class="activity-icon activity-icon--session">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 6C11 5.44772 10.5523 5 10 5C9.44772 5 9 5.44772 9 6V10C9 10.2652 9.10536 10.5196 9.29289 10.7071L12.1213 13.5355C12.5118 13.9261 13.145 13.9261 13.5355 13.5355C13.9261 13.145 13.9261 12.5118 13.5355 12.1213L11 9.58579V6Z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div class="activity-content">
+                <p class="activity-title">{{ session.course.name }} - {{ session.course.code }}</p>
+                <p class="activity-meta">{{ session.teacher.get_full_name }} • {{ session.created_at|timesince }} ago</p>
+              </div>
+              <span class="badge badge-{% if session.is_active %}green{% else %}gray{% endif %}">
+                {% if session.is_active %}Active{% else %}Ended{% endif %}
+              </span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <svg class="empty-icon" width="48" height="48" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 6C11 5.44772 10.5523 5 10 5C9.44772 5 9 5.44772 9 6V10C9 10.2652 9.10536 10.5196 9.29289 10.7071L12.1213 13.5355C12.5118 13.9261 13.145 13.9261 13.5355 13.5355C13.9261 13.145 13.9261 12.5118 13.5355 12.1213L11 9.58579V6Z" fill="currentColor"/>
+            </svg>
+            <p class="empty-text">No recent sessions</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="activity-card">
+      <div class="card-header">
+        <h3 class="card-title">Recent Users</h3>
+        <a href="{% url 'admin:accounts_user_changelist' %}" class="view-all-link">View All</a>
+      </div>
+      <div class="activity-list">
+        {% if recent_users %}
+          {% for user in recent_users %}
+            <div class="activity-item">
+              <div class="activity-avatar">
+                {% if user.profile_picture %}
+                  <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
+                {% else %}
+                  <div class="avatar-placeholder">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+                {% endif %}
+              </div>
+              <div class="activity-content">
+                <p class="activity-title">{{ user.get_full_name|default:user.username }}</p>
+                <p class="activity-meta">{{ user.email }} • Joined {{ user.date_joined|timesince }} ago</p>
+              </div>
+              <span class="badge badge-{% if user.role == 'ADMIN' %}blue{% elif user.role == 'TEACHER' %}green{% else %}gray{% endif %}">
+                {{ user.get_role_display }}
+              </span>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <svg class="empty-icon" width="48" height="48" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M10 9C11.6569 9 13 7.65685 13 6C13 4.34315 11.6569 3 10 3C8.34315 3 7 4.34315 7 6C7 7.65685 8.34315 9 10 9ZM3 18C3 14.134 6.13401 11 10 11C13.866 11 17 14.134 17 18H3Z" fill="currentColor"/>
+            </svg>
+            <p class="empty-text">No recent users</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions-section">
+    <h3 class="section-title">Quick Actions</h3>
+    <div class="quick-actions-grid">
+      <a href="{% url 'admin:attendance_session_add' %}" class="quick-action-card">
+        <div class="quick-action-icon quick-action-icon--primary">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 6C11 5.44772 10.5523 5 10 5C9.44772 5 9 5.44772 9 6V10C9 10.2652 9.10536 10.5196 9.29289 10.7071L12.1213 13.5355C12.5118 13.9261 13.145 13.9261 13.5355 13.5355C13.9261 13.145 13.9261 12.5118 13.5355 12.1213L11 9.58579V6Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h4 class="quick-action-title">Create Session</h4>
+        <p class="quick-action-desc">Start a new attendance session</p>
+      </a>
+
+      <a href="{% url 'admin:academics_course_add' %}" class="quick-action-card">
+        <div class="quick-action-icon quick-action-icon--success">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.394 2.08975C10.1472 1.96692 9.85282 1.96692 9.60598 2.08975L2.10598 5.83975C1.428 6.17866 1.428 7.15541 2.10598 7.49432L9.60598 11.2443C9.85282 11.3671 10.1472 11.3671 10.394 11.2443L17.894 7.49432C18.572 7.15541 18.572 6.17866 17.894 5.83975L10.394 2.08975Z" fill="currentColor"/>
+            <path d="M3.5 9.21922L9.60598 12.0742C9.85282 12.197 10.1472 12.197 10.394 12.0742L16.5 9.21922V13.5C16.5 14.3284 15.8284 15 15 15H5C4.17157 15 3.5 14.3284 3.5 13.5V9.21922Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h4 class="quick-action-title">Add Course</h4>
+        <p class="quick-action-desc">Create a new course</p>
+      </a>
+
+      <a href="{% url 'admin:accounts_user_add' %}" class="quick-action-card">
+        <div class="quick-action-icon quick-action-icon--warning">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 6C9 7.65685 7.65685 9 6 9C4.34315 9 3 7.65685 3 6C3 4.34315 4.34315 3 6 3C7.65685 3 9 4.34315 9 6Z" fill="currentColor"/>
+            <path d="M17 6C17 7.65685 15.6569 9 14 9C12.3431 9 11 7.65685 11 6C11 4.34315 12.3431 3 14 3C15.6569 3 17 4.34315 17 6Z" fill="currentColor"/>
+            <path d="M12.9291 17C12.9758 16.6734 13 16.3395 13 16C13 14.3648 12.4393 12.8606 11.4998 11.6691C12.2352 11.2435 13.0892 11 14 11C16.7614 11 19 13.2386 19 16V17H12.9291Z" fill="currentColor"/>
+            <path d="M6 11C8.76142 11 11 13.2386 11 16V17H1V16C1 13.2386 3.23858 11 6 11Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h4 class="quick-action-title">Add User</h4>
+        <p class="quick-action-desc">Register a new user</p>
+      </a>
+
+      <a href="{% url 'admin:audit_auditlog_changelist' %}" class="quick-action-card">
+        <div class="quick-action-icon quick-action-icon--info">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3 5C3 3.89543 3.89543 3 5 3H15C16.1046 3 17 3.89543 17 5V15C17 16.1046 16.1046 17 15 17H5C3.89543 17 3 16.1046 3 15V5ZM7 7C6.44772 7 6 7.44772 6 8C6 8.55228 6.44772 9 7 9H13C13.5523 9 14 8.55228 14 8C14 7.44772 13.5523 7 13 7H7ZM7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13H10C10.5523 13 11 12.5523 11 12C11 11.4477 10.5523 11 10 11H7Z" fill="currentColor"/>
+          </svg>
+        </div>
+        <h4 class="quick-action-title">View Audit Logs</h4>
+        <p class="quick-action-desc">Check system activity</p>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

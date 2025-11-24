@@ -1,0 +1,192 @@
+{% extends "admin/base_site.html" %}
+{% load admin_urls static admin_list i18n %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header__content">
+      <h1 class="page-title">{{ title }}</h1>
+      {% if subtitle %}
+        <p class="page-subtitle">{{ subtitle }}</p>
+      {% endif %}
+    </div>
+    <div class="page-header__actions">
+      {% block object-tools %}
+        {% if has_add_permission %}
+          <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?{{ is_popup }}{% endif %}" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M10 3C10.5523 3 11 3.44772 11 4V9H16C16.5523 9 17 9.44772 17 10C17 10.5523 16.5523 11 16 11H11V16C11 16.5523 10.5523 17 10 17C9.44772 17 9 16.5523 9 16V11H4C3.44772 11 3 10.5523 3 10C3 9.44772 3.44772 9 4 9H9V4C9 3.44772 9.44772 3 10 3Z" fill="currentColor"/>
+            </svg>
+            Add {{ opts.verbose_name }}
+          </a>
+        {% endif %}
+      {% endblock %}
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="list-controls">
+    {% block search %}
+      {% if cl.search_fields %}
+        <div class="search-container">
+          <form id="changelist-search" method="get">
+            <div class="search-wrapper">
+              <svg class="search-icon" width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M8 4C5.79086 4 4 5.79086 4 8C4 10.2091 5.79086 12 8 12C10.2091 12 12 10.2091 12 8C12 5.79086 10.2091 4 8 4ZM2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8C14 9.29583 13.5892 10.4957 12.8907 11.4765L17.7071 16.2929C18.0976 16.6834 18.0976 17.3166 17.7071 17.7071C17.3166 18.0976 16.6834 18.0976 16.2929 17.7071L11.4765 12.8907C10.4957 13.5892 9.29583 14 8 14C4.68629 14 2 11.3137 2 8Z" fill="currentColor"/>
+              </svg>
+              <input type="text" 
+                     name="{{ search_var }}" 
+                     value="{{ cl.query }}" 
+                     class="search-input" 
+                     placeholder="Search {{ opts.verbose_name_plural }}..."
+                     aria-label="Search">
+              {% if show_result_count %}
+                <input type="hidden" name="{{ page_var }}" value="{{ cl.paginator.num_pages }}">
+              {% endif %}
+              {% for k, v in cl.params.items %}
+                {% if k != search_var %}
+                  <input type="hidden" name="{{ k }}" value="{{ v }}">
+                {% endif %}
+              {% endfor %}
+              <button type="submit" class="btn btn-secondary search-btn">Search</button>
+            </div>
+          </form>
+        </div>
+      {% endif %}
+    {% endblock %}
+
+    {% if cl.has_filters %}
+      <button class="btn btn-secondary filter-toggle" id="filterToggle">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M3 3C2.44772 3 2 3.44772 2 4C2 4.55228 2.44772 5 3 5H17C17.5523 5 18 4.55228 18 4C18 3.44772 17.5523 3 17 3H3ZM5 8C5 7.44772 5.44772 7 6 7H14C14.5523 7 15 7.44772 15 8C15 8.55228 14.5523 9 14 9H6C5.44772 9 5 8.55228 5 8ZM8 12C7.44772 12 7 12.4477 7 13C7 13.5523 7.44772 14 8 14H12C12.5523 14 13 13.5523 13 13C13 12.4477 12.5523 12 12 12H8Z" fill="currentColor"/>
+        </svg>
+        Filters
+        {% if cl.get_filters_params %}
+          <span class="filter-count">{{ cl.get_filters_params|length }}</span>
+        {% endif %}
+      </button>
+    {% endif %}
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="list-layout">
+    <!-- Filters Sidebar -->
+    {% if cl.has_filters %}
+      <aside class="filters-sidebar" id="filtersSidebar">
+        <div class="filters-header">
+          <h3 class="filters-title">Filters</h3>
+          {% if cl.get_filters_params %}
+            <a href="?" class="clear-filters">Clear all</a>
+          {% endif %}
+        </div>
+        <div class="filters-content">
+          {% for spec in cl.filter_specs %}
+            {% admin_list_filter cl spec %}
+          {% endfor %}
+        </div>
+      </aside>
+    {% endif %}
+
+    <!-- Results Table -->
+    <div class="results-container">
+      {% block result_list %}
+        {% if action_form and actions_on_top and cl.show_admin_actions %}
+          <div class="actions-bar">
+            {% admin_actions %}
+          </div>
+        {% endif %}
+
+        <div class="data-table-container">
+          {% if cl.result_count %}
+            <div class="table-info-bar">
+              <span class="result-count">
+                {{ cl.result_count }} {{ cl.opts.verbose_name_plural }}
+              </span>
+              {% if cl.formset and cl.result_count %}
+                <div class="table-actions">
+                  {% if action_form and actions_on_bottom and cl.show_admin_actions %}
+                    {% admin_actions %}
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="table-wrapper">
+              <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>
+                {% csrf_token %}
+                {% if cl.formset %}
+                  <div>{{ cl.formset.management_form }}</div>
+                {% endif %}
+
+                {% result_list cl %}
+
+                {% if cl.formset and cl.result_count %}
+                  <div class="table-footer-actions">
+                    {% if action_form and actions_on_bottom and cl.show_admin_actions %}
+                      {% admin_actions %}
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </form>
+            </div>
+
+            <!-- Pagination -->
+            {% if cl.result_count != cl.full_result_count %}
+              <p class="paginator-info">
+                <span class="small quiet">
+                  {% blocktrans with cl.result_count as result_count and cl.full_result_count as full_result_count %}
+                    {{ result_count }} of {{ full_result_count }} selected
+                  {% endblocktrans %}
+                </span>
+              </p>
+            {% endif %}
+
+            {% if cl.paginator.num_pages > 1 %}
+              <div class="pagination-container">
+                {% pagination cl %}
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="empty-state">
+              <svg class="empty-icon" width="64" height="64" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M3 5C3 3.89543 3.89543 3 5 3H15C16.1046 3 17 3.89543 17 5V15C17 16.1046 16.1046 17 15 17H5C3.89543 17 3 16.1046 3 15V5ZM7 7C6.44772 7 6 7.44772 6 8C6 8.55228 6.44772 9 7 9H13C13.5523 9 14 8.55228 14 8C14 7.44772 13.5523 7 13 7H7ZM7 11C6.44772 11 6 11.4477 6 12C6 12.5523 6.44772 13 7 13H10C10.5523 13 11 12.5523 11 12C11 11.4477 10.5523 11 10 11H7Z" fill="currentColor"/>
+              </svg>
+              <h3 class="empty-title">No {{ opts.verbose_name_plural }} found</h3>
+              <p class="empty-text">
+                {% if cl.query %}
+                  No results match your search query.
+                {% else %}
+                  Get started by adding your first {{ opts.verbose_name }}.
+                {% endif %}
+              </p>
+              {% if has_add_permission %}
+                <a href="{% url cl.opts|admin_urlname:'add' %}" class="btn btn-primary">
+                  Add {{ opts.verbose_name }}
+                </a>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Filter toggle functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const filterToggle = document.getElementById('filterToggle');
+    const filtersSidebar = document.getElementById('filtersSidebar');
+    
+    if (filterToggle && filtersSidebar) {
+      filterToggle.addEventListener('click', function() {
+        filtersSidebar.classList.toggle('active');
+        this.classList.toggle('active');
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends "admin/base_site.html" %}
+{% load admin_urls static admin_modify i18n %}
+
+{% block title %}{% if add %}Add {{ opts.verbose_name }}{% else %}Change {{ opts.verbose_name }}{% endif %} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="page-header__content">
+      <h1 class="page-title">
+        {% if add %}Add {{ opts.verbose_name }}{% else %}Change {{ opts.verbose_name }}{% endif %}
+      </h1>
+      {% if subtitle %}
+        <p class="page-subtitle">{{ subtitle }}</p>
+      {% endif %}
+    </div>
+    <div class="page-header__actions">
+      {% if has_view_permission %}
+        <a href="{% url opts|admin_urlname:'changelist' %}" class="btn btn-secondary">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9.70711 16.7071C9.31658 17.0976 8.68342 17.0976 8.29289 16.7071L2.29289 10.7071C1.90237 10.3166 1.90237 9.68342 2.29289 9.29289L8.29289 3.29289C8.68342 2.90237 9.31658 2.90237 9.70711 3.29289C10.0976 3.68342 10.0976 4.31658 9.70711 4.70711L5.41421 9H17C17.5523 9 18 9.44772 18 10C18 10.5523 17.5523 11 17 11H5.41421L9.70711 15.2929C10.0976 15.6834 10.0976 16.3166 9.70711 16.7071Z" fill="currentColor"/>
+          </svg>
+          Back to list
+        </a>
+      {% endif %}
+      {% if has_delete_permission and not is_popup %}
+        <a href="{% url opts|admin_urlname:'delete' original.pk|admin_urlquote %}" class="btn btn-danger">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M9 2C8.62123 2 8.27497 2.214 8.10557 2.55279L7.38197 4H4C3.44772 4 3 4.44772 3 5C3 5.55228 3.44772 6 4 6V16C4 17.1046 4.89543 18 6 18H14C15.1046 18 16 17.1046 16 16V6C16.5523 6 17 5.55228 17 5C17 4.44772 16.5523 4 16 4H12.618L11.8944 2.55279C11.725 2.214 11.3788 2 11 2H9ZM7 8C7 7.44772 7.44772 7 8 7C8.55228 7 9 7.44772 9 8V14C9 14.5523 8.55228 15 8 15C7.44772 15 7 14.5523 7 14V8ZM12 7C11.4477 7 11 7.44772 11 8V14C11 14.5523 11.4477 15 12 15C12.5523 15 13 14.5523 13 14V8C13 7.44772 12.5523 7 12 7Z" fill="currentColor"/>
+          </svg>
+          Delete
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Form Container -->
+  <div class="form-container">
+    <form method="post" id="{{ opts.model_name }}_form" novalidate {% if has_file_field %}enctype="multipart/form-data"{% endif %}>
+      {% csrf_token %}
+      
+      {% if errors %}
+        <div class="alert alert-error">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 7C11 6.44772 10.5523 6 10 6C9.44772 6 9 6.44772 9 7V10C9 10.5523 9.44772 11 10 11C10.5523 11 11 10.5523 11 10V7ZM10 14C10.5523 14 11 13.5523 11 13C11 12.4477 10.5523 12 10 12C9.44772 12 9 12.4477 9 13C9 13.5523 9.44772 14 10 14Z" fill="currentColor"/>
+          </svg>
+          <div>
+            <p class="alert-title">Please correct the errors below</p>
+            {{ adminform.form.non_field_errors }}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if adminform %}
+        <div class="form-content">
+          {% for fieldset in adminform %}
+            <div class="fieldset-card">
+              {% if fieldset.name %}
+                <div class="fieldset-header">
+                  <h2 class="fieldset-title">{{ fieldset.name }}</h2>
+                  {% if fieldset.description %}
+                    <p class="fieldset-description">{{ fieldset.description }}</p>
+                  {% endif %}
+                </div>
+              {% endif %}
+              
+              <div class="fieldset-body">
+                {% for line in fieldset %}
+                  <div class="form-row {% if line.fields|length_is:'1' %}form-row--full{% else %}form-row--grid{% endif %}">
+                    {% for field in line %}
+                      <div class="form-field {% if field.field.errors %}form-field--error{% endif %}">
+                        {% if field.is_checkbox %}
+                          <div class="checkbox-wrapper">
+                            {{ field.field }}
+                            <label for="{{ field.field.id_for_label }}" class="checkbox-label">
+                              {{ field.field.label }}
+                              {% if field.field.field.required %}
+                                <span class="required-indicator">*</span>
+                              {% endif %}
+                            </label>
+                          </div>
+                        {% else %}
+                          <label for="{{ field.field.id_for_label }}" class="form-label">
+                            {{ field.field.label }}
+                            {% if field.field.field.required %}
+                              <span class="required-indicator">*</span>
+                            {% endif %}
+                          </label>
+                          {{ field.field }}
+                        {% endif %}
+                        
+                        {% if field.field.help_text %}
+                          <p class="form-help">{{ field.field.help_text|safe }}</p>
+                        {% endif %}
+                        
+                        {% if field.field.errors %}
+                          <div class="form-error">
+                            {{ field.field.errors }}
+                          </div>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Inline Forms -->
+      {% if inline_admin_formsets %}
+        <div class="inline-forms">
+          {% for inline_admin_formset in inline_admin_formsets %}
+            <div class="inline-group">
+              <div class="inline-header">
+                <h3 class="inline-title">{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h3>
+              </div>
+              {{ inline_admin_formset.formset.management_form }}
+              <div class="inline-related">
+                {% for inline_admin_form in inline_admin_formset %}
+                  <div class="inline-form-card">
+                    {% if inline_admin_form.form.non_field_errors %}
+                      <div class="alert alert-error">
+                        {{ inline_admin_form.form.non_field_errors }}
+                      </div>
+                    {% endif %}
+                    {% for fieldset in inline_admin_form %}
+                      {% for line in fieldset %}
+                        <div class="form-row form-row--grid">
+                          {% for field in line %}
+                            <div class="form-field {% if field.field.errors %}form-field--error{% endif %}">
+                              <label for="{{ field.field.id_for_label }}" class="form-label">
+                                {{ field.field.label }}
+                              </label>
+                              {{ field.field }}
+                              {% if field.field.errors %}
+                                <div class="form-error">{{ field.field.errors }}</div>
+                              {% endif %}
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% endfor %}
+                    {% endfor %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <div class="form-actions__primary">
+          <button type="submit" name="_save" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M16.7071 5.29289C17.0976 5.68342 17.0976 6.31658 16.7071 6.70711L8.70711 14.7071C8.31658 15.0976 7.68342 15.0976 7.29289 14.7071L3.29289 10.7071C2.90237 10.3166 2.90237 9.68342 3.29289 9.29289C3.68342 8.90237 4.31658 8.90237 4.70711 9.29289L8 12.5858L15.2929 5.29289C15.6834 4.90237 16.3166 4.90237 16.7071 5.29289Z" fill="currentColor"/>
+            </svg>
+            Save
+          </button>
+          {% if has_add_permission %}
+            <button type="submit" name="_addanother" class="btn btn-secondary">
+              Save and add another
+            </button>
+          {% endif %}
+          {% if has_change_permission %}
+            <button type="submit" name="_continue" class="btn btn-secondary">
+              Save and continue editing
+            </button>
+          {% endif %}
+        </div>
+        <div class="form-actions__secondary">
+          <a href="{% url opts|admin_urlname:'changelist' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

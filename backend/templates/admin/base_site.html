@@ -23,6 +23,8 @@
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/components.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/navigation.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/dashboard.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/list-views.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/form-views.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/responsive.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
 {% endblock %}
@@ -31,7 +33,11 @@
 
 {% block extrahead %}
     {{ block.super }}
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Custom Scripts -->
     <script src="{% static 'admin/js/navigation.js' %}" defer></script>
+    <script src="{% static 'admin/js/charts.js' %}" defer></script>
 {% endblock %}
 
 {% block header %}

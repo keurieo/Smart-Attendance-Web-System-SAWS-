@@ -1,0 +1,568 @@
+/**
+ * Form Views (change_form) Styles
+ * Modern styling for Django admin form pages
+ */
+
+/* ============================================
+   Form Container
+   ============================================ */
+
+.form-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ============================================
+   Fieldset Cards
+   ============================================ */
+
+.fieldset-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.fieldset-header {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--gray-200);
+  background-color: var(--gray-50);
+}
+
+.fieldset-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
+  color: var(--gray-900);
+  margin-bottom: var(--space-2);
+}
+
+.fieldset-description {
+  font-size: var(--text-sm);
+  color: var(--gray-600);
+}
+
+.fieldset-body {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ============================================
+   Form Rows
+   ============================================ */
+
+.form-row {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.form-row--full {
+  grid-template-columns: 1fr;
+}
+
+.form-row--grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* ============================================
+   Form Fields
+   ============================================ */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--gray-700);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.required-indicator {
+  color: var(--error);
+  font-weight: var(--font-bold);
+}
+
+/* Input Styling */
+.form-field input[type="text"],
+.form-field input[type="email"],
+.form-field input[type="password"],
+.form-field input[type="number"],
+.form-field input[type="url"],
+.form-field input[type="tel"],
+.form-field input[type="date"],
+.form-field input[type="time"],
+.form-field input[type="datetime-local"],
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  line-height: var(--leading-normal);
+  color: var(--gray-900);
+  background-color: #ffffff;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-field textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Select Dropdown */
+.form-field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-4) center;
+  padding-right: var(--space-12);
+  cursor: pointer;
+}
+
+/* Checkbox & Radio */
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+}
+
+.form-field input[type="checkbox"],
+.form-field input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--gray-300);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.form-field input[type="checkbox"] {
+  border-radius: var(--radius-sm);
+}
+
+.form-field input[type="radio"] {
+  border-radius: var(--radius-full);
+}
+
+.form-field input[type="checkbox"]:checked,
+.form-field input[type="radio"]:checked {
+  background-color: var(--primary-600);
+  border-color: var(--primary-600);
+}
+
+.checkbox-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--gray-700);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* File Upload */
+.form-field input[type="file"] {
+  padding: var(--space-3);
+  border: 2px dashed var(--gray-300);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.form-field input[type="file"]:hover {
+  border-color: var(--primary-600);
+  background-color: var(--primary-50);
+}
+
+/* Help Text */
+.form-help {
+  font-size: var(--text-xs);
+  color: var(--gray-500);
+  line-height: var(--leading-normal);
+}
+
+/* Error State */
+.form-field--error input,
+.form-field--error select,
+.form-field--error textarea {
+  border-color: var(--error);
+}
+
+.form-field--error input:focus,
+.form-field--error select:focus,
+.form-field--error textarea:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-error {
+  font-size: var(--text-xs);
+  color: var(--error);
+  font-weight: var(--font-medium);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.form-error::before {
+  content: '⚠';
+  font-size: var(--text-sm);
+}
+
+/* ============================================
+   Inline Forms
+   ============================================ */
+
+.inline-forms {
+  margin-top: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.inline-group {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.inline-header {
+  padding: var(--space-6);
+  background-color: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.inline-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--gray-900);
+}
+
+.inline-related {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.inline-form-card {
+  padding: var(--space-4);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background-color: var(--gray-50);
+}
+
+/* ============================================
+   Form Actions
+   ============================================ */
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  margin-top: var(--space-8);
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  bottom: var(--space-6);
+  z-index: var(--z-sticky);
+}
+
+.form-actions__primary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.form-actions__secondary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ============================================
+   Alert Messages
+   ============================================ */
+
+.alert {
+  display: flex;
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border-left: 4px solid;
+  margin-bottom: var(--space-6);
+}
+
+.alert svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.alert-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--space-1);
+}
+
+.alert-error {
+  background-color: var(--error-light);
+  border-color: var(--error);
+  color: #991b1b;
+}
+
+.alert-success {
+  background-color: var(--success-light);
+  border-color: var(--success);
+  color: #065f46;
+}
+
+.alert-warning {
+  background-color: var(--warning-light);
+  border-color: var(--warning);
+  color: #92400e;
+}
+
+.alert-info {
+  background-color: var(--info-light);
+  border-color: var(--info);
+  color: var(--primary-900);
+}
+
+/* ============================================
+   Date/Time Pickers
+   ============================================ */
+
+.form-field input[type="date"],
+.form-field input[type="time"],
+.form-field input[type="datetime-local"] {
+  position: relative;
+  cursor: pointer;
+}
+
+.form-field input[type="date"]::-webkit-calendar-picker-indicator,
+.form-field input[type="time"]::-webkit-calendar-picker-indicator,
+.form-field input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.form-field input[type="date"]:hover::-webkit-calendar-picker-indicator,
+.form-field input[type="time"]:hover::-webkit-calendar-picker-indicator,
+.form-field input[type="datetime-local"]:hover::-webkit-calendar-picker-indicator {
+  opacity: 1;
+}
+
+/* ============================================
+   Django Admin Specific Overrides
+   ============================================ */
+
+/* Override Django's default form styling */
+.form-row .field-box {
+  padding: 0;
+  margin: 0;
+}
+
+.form-row .help {
+  font-size: var(--text-xs);
+  color: var(--gray-500);
+}
+
+.form-row .errors {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.form-row .errorlist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.form-row .errorlist li {
+  font-size: var(--text-xs);
+  color: var(--error);
+  font-weight: var(--font-medium);
+}
+
+/* Django's vTextField (large text inputs) */
+.vTextField {
+  width: 100% !important;
+}
+
+/* Django's vLargeTextField (textareas) */
+.vLargeTextField {
+  width: 100% !important;
+  min-height: 150px !important;
+}
+
+/* Django's vDateField */
+.vDateField {
+  width: 100% !important;
+}
+
+/* Django's vTimeField */
+.vTimeField {
+  width: 100% !important;
+}
+
+/* ============================================
+   Loading States
+   ============================================ */
+
+.form-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.form-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--primary-600);
+  border-radius: var(--radius-full);
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ============================================
+   Responsive Styles
+   ============================================ */
+
+@media (max-width: 1023px) {
+  .form-row--grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .form-actions__primary,
+  .form-actions__secondary {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .form-actions__primary .btn,
+  .form-actions__secondary .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .fieldset-header,
+  .fieldset-body {
+    padding: var(--space-4);
+  }
+  
+  .inline-header,
+  .inline-related {
+    padding: var(--space-4);
+  }
+  
+  .form-actions {
+    padding: var(--space-4);
+    position: static;
+  }
+}
+
+/* ============================================
+   Success Message Styling
+   ============================================ */
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  background-color: var(--success-light);
+  border-left: 4px solid var(--success);
+  border-radius: var(--radius-md);
+  color: #065f46;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  margin-bottom: var(--space-6);
+  animation: slideDown 0.3s ease;
+}
+
+.success-message svg {
+  width: 20px;
+  height: 20px;
+  color: var(--success);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   Disabled State
+   ============================================ */
+
+.form-field input:disabled,
+.form-field select:disabled,
+.form-field textarea:disabled {
+  background-color: var(--gray-100);
+  color: var(--gray-500);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* ============================================
+   Read-only State
+   ============================================ */
+
+.form-field input[readonly],
+.form-field select[readonly],
+.form-field textarea[readonly] {
+  background-color: var(--gray-50);
+  border-color: var(--gray-200);
+  cursor: default;
+}
