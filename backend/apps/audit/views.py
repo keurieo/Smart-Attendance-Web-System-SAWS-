@@ -1,7 +1,9 @@
 from rest_framework import generics, filters
 from rest_framework.pagination import PageNumberPagination
 from django_filters import rest_framework as django_filters
-from django.utils.dateparse import parse_datetime
+from django.utils.dateparse import parse_date
+from django.utils import timezone
+from datetime import datetime, time
 from apps.accounts.permissions import IsAdmin
 from .models import AuditLog
 from .serializers import AuditLogSerializer
@@ -27,19 +29,57 @@ class AuditLogFilter(django_filters.FilterSet):
         fields = ['user_id', 'date_from', 'date_to', 'action', 'target_table']
     
     def filter_date_from(self, queryset, name, value):
-        """Filter logs from the specified date (inclusive)."""
+        """
+        Filter logs from the specified date (inclusive, start of day).
+        
+        Accepts date strings in YYYY-MM-DD format and filters records
+        from 00:00:00 of that date onwards. Handles timezone conversion
+        to ensure accurate filtering regardless of server timezone.
+        
+        Args:
+            queryset: The queryset to filter
+            name: The filter field name
+            value: Date string in YYYY-MM-DD format
+            
+        Returns:
+            Filtered queryset or original if date parsing fails
+        """
         if value:
-            date = parse_datetime(value)
-            if date:
-                return queryset.filter(performed_at__gte=date)
+            # Parse date-only string (YYYY-MM-DD)
+            date_obj = parse_date(value)
+            if date_obj:
+                # Convert to datetime at start of day (00:00:00)
+                dt_start = datetime.combine(date_obj, time.min)
+                # Make timezone-aware
+                dt_aware = timezone.make_aware(dt_start)
+                return queryset.filter(performed_at__gte=dt_aware)
         return queryset
     
     def filter_date_to(self, queryset, name, value):
-        """Filter logs until the specified date (inclusive)."""
+        """
+        Filter logs until the specified date (inclusive, end of day).
+        
+        Accepts date strings in YYYY-MM-DD format and filters records
+        until 23:59:59.999999 of that date. Handles timezone conversion
+        to ensure accurate filtering regardless of server timezone.
+        
+        Args:
+            queryset: The queryset to filter
+            name: The filter field name
+            value: Date string in YYYY-MM-DD format
+            
+        Returns:
+            Filtered queryset or original if date parsing fails
+        """
         if value:
-            date = parse_datetime(value)
-            if date:
-                return queryset.filter(performed_at__lte=date)
+            # Parse date-only string (YYYY-MM-DD)
+            date_obj = parse_date(value)
+            if date_obj:
+                # Convert to datetime at end of day (23:59:59.999999)
+                dt_end = datetime.combine(date_obj, time.max)
+                # Make timezone-aware
+                dt_aware = timezone.make_aware(dt_end)
+                return queryset.filter(performed_at__lte=dt_aware)
         return queryset
 
 

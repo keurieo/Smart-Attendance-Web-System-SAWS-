@@ -10,7 +10,7 @@
   <div class="dashboard-header">
     <div>
       <h1 class="dashboard-title">Dashboard</h1>
-      <p class="dashboard-subtitle">Welcome back, {{ user.get_full_name|default:user.username }}</p>
+      <p class="dashboard-subtitle">Welcome back, {{ user.full_name|default:user.email }}</p>
     </div>
     <div class="dashboard-actions">
       <button class="btn btn-secondary">
@@ -30,10 +30,12 @@
 
   <!-- Metrics Grid -->
   <div class="metrics-grid">
-    {% include "admin/includes/metric_card.html" with title="Total Users" value=metrics.total_users icon="users" trend="+12%" trend_up=True %}
-    {% include "admin/includes/metric_card.html" with title="Active Sessions" value=metrics.active_sessions icon="clock" trend="+5%" trend_up=True %}
-    {% include "admin/includes/metric_card.html" with title="Attendance Rate" value=metrics.attendance_rate percentage=True icon="check" trend="-2%" trend_up=False %}
-    {% include "admin/includes/metric_card.html" with title="Total Courses" value=metrics.total_courses icon="book" trend="+3" trend_up=True %}
+    {% if metrics %}
+      {% include "admin/includes/metric_card.html" with title="Total Users" value=metrics.total_users icon="users" trend=metrics.user_growth_trend trend_up=True %}
+      {% include "admin/includes/metric_card.html" with title="Active Sessions" value=metrics.active_sessions icon="clock" trend=metrics.session_growth_trend trend_up=True %}
+      {% include "admin/includes/metric_card.html" with title="Attendance Rate" value=metrics.attendance_rate percentage=True icon="check" trend=metrics.attendance_rate_trend trend_up=False %}
+      {% include "admin/includes/metric_card.html" with title="Total Courses" value=metrics.total_courses icon="book" trend=metrics.course_growth_trend trend_up=True %}
+    {% endif %}
   </div>
 
   <!-- Charts Section -->
@@ -73,11 +75,11 @@
     <div class="activity-card">
       <div class="card-header">
         <h3 class="card-title">Recent Sessions</h3>
-        <a href="{% url 'admin:attendance_session_changelist' %}" class="view-all-link">View All</a>
+        <a href="{% url 'admin:attendance_attendancesession_changelist' %}" class="view-all-link">View All</a>
       </div>
       <div class="activity-list">
-        {% if recent_sessions %}
-          {% for session in recent_sessions %}
+        {% if metrics.recent_sessions %}
+          {% for session in metrics.recent_sessions %}
             <div class="activity-item">
               <div class="activity-icon activity-icon--session">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -85,11 +87,11 @@
                 </svg>
               </div>
               <div class="activity-content">
-                <p class="activity-title">{{ session.course.name }} - {{ session.course.code }}</p>
-                <p class="activity-meta">{{ session.teacher.get_full_name }} • {{ session.created_at|timesince }} ago</p>
+                <p class="activity-title">{{ session.course.title }} - {{ session.course.code }}</p>
+                <p class="activity-meta">{{ session.created_by.full_name }} • {{ session.created_at|timesince }} ago</p>
               </div>
-              <span class="badge badge-{% if session.is_active %}green{% else %}gray{% endif %}">
-                {% if session.is_active %}Active{% else %}Ended{% endif %}
+              <span class="badge badge-{% if session.status == 'active' %}green{% else %}gray{% endif %}">
+                {% if session.status == 'active' %}Active{% else %}Ended{% endif %}
               </span>
             </div>
           {% endfor %}
@@ -110,22 +112,22 @@
         <a href="{% url 'admin:accounts_user_changelist' %}" class="view-all-link">View All</a>
       </div>
       <div class="activity-list">
-        {% if recent_users %}
-          {% for user in recent_users %}
+        {% if metrics.recent_users %}
+          {% for user in metrics.recent_users %}
             <div class="activity-item">
               <div class="activity-avatar">
                 {% if user.profile_picture %}
                   <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
                 {% else %}
-                  <div class="avatar-placeholder">{{ user.first_name|first|upper|default:user.username|first|upper }}</div>
+                  <div class="avatar-placeholder">{{ user.full_name|first|upper|default:user.email|first|upper }}</div>
                 {% endif %}
               </div>
               <div class="activity-content">
-                <p class="activity-title">{{ user.get_full_name|default:user.username }}</p>
-                <p class="activity-meta">{{ user.email }} • Joined {{ user.date_joined|timesince }} ago</p>
+                <p class="activity-title">{{ user.full_name|default:user.email }}</p>
+                <p class="activity-meta">{{ user.email }} • Joined {{ user.created_at|timesince }} ago</p>
               </div>
-              <span class="badge badge-{% if user.role == 'ADMIN' %}blue{% elif user.role == 'TEACHER' %}green{% else %}gray{% endif %}">
-                {{ user.get_role_display }}
+              <span class="badge badge-{% if user.role.name == 'admin' %}blue{% elif user.role.name == 'teacher' %}green{% else %}gray{% endif %}">
+                {{ user.role.get_name_display }}
               </span>
             </div>
           {% endfor %}
@@ -145,7 +147,7 @@
   <div class="quick-actions-section">
     <h3 class="section-title">Quick Actions</h3>
     <div class="quick-actions-grid">
-      <a href="{% url 'admin:attendance_session_add' %}" class="quick-action-card">
+      <a href="{% url 'admin:attendance_attendancesession_add' %}" class="quick-action-card">
         <div class="quick-action-icon quick-action-icon--primary">
           <svg width="24" height="24" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" clip-rule="evenodd" d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18ZM11 6C11 5.44772 10.5523 5 10 5C9.44772 5 9 5.44772 9 6V10C9 10.2652 9.10536 10.5196 9.29289 10.7071L12.1213 13.5355C12.5118 13.9261 13.145 13.9261 13.5355 13.5355C13.9261 13.145 13.9261 12.5118 13.5355 12.1213L11 9.58579V6Z" fill="currentColor"/>

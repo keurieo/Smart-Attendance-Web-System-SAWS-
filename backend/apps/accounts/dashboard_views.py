@@ -5,7 +5,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.db.models import Count, Q, Avg
 from apps.accounts.models import User
-from apps.attendance.models import Session, AttendanceRecord
+from apps.attendance.models import AttendanceSession, AttendanceRecord
 from apps.academics.models import Course, Enrollment
 
 
@@ -26,9 +26,9 @@ class DashboardMetrics:
     
     def get_active_sessions(self):
         """Get number of currently active sessions"""
-        return Session.objects.filter(
-            is_active=True,
-            expires_at__gt=self.now
+        return AttendanceSession.objects.filter(
+            status=AttendanceSession.ACTIVE,
+            end_at__gt=self.now
         ).count()
     
     def get_attendance_rate(self):
@@ -38,7 +38,7 @@ class DashboardMetrics:
             return 0
         
         present_records = AttendanceRecord.objects.filter(
-            status='PRESENT'
+            status=AttendanceRecord.PRESENT
         ).count()
         
         rate = (present_records / total_records) * 100
@@ -50,23 +50,23 @@ class DashboardMetrics:
     
     def get_recent_sessions(self, limit=5):
         """Get most recent sessions"""
-        return Session.objects.select_related(
-            'course', 'teacher'
+        return AttendanceSession.objects.select_related(
+            'course', 'created_by'
         ).order_by('-created_at')[:limit]
     
     def get_recent_users(self, limit=5):
         """Get most recently registered users"""
-        return User.objects.order_by('-date_joined')[:limit]
+        return User.objects.order_by('-created_at')[:limit]
     
     def get_user_growth_trend(self):
         """Calculate user growth percentage over last week"""
         users_this_week = User.objects.filter(
-            date_joined__gte=self.week_ago
+            created_at__gte=self.week_ago
         ).count()
         
         users_last_week = User.objects.filter(
-            date_joined__gte=self.week_ago - timedelta(days=7),
-            date_joined__lt=self.week_ago
+            created_at__gte=self.week_ago - timedelta(days=7),
+            created_at__lt=self.week_ago
         ).count()
         
         if users_last_week == 0:
@@ -78,11 +78,11 @@ class DashboardMetrics:
     
     def get_session_growth_trend(self):
         """Calculate session growth percentage over last week"""
-        sessions_this_week = Session.objects.filter(
+        sessions_this_week = AttendanceSession.objects.filter(
             created_at__gte=self.week_ago
         ).count()
         
-        sessions_last_week = Session.objects.filter(
+        sessions_last_week = AttendanceSession.objects.filter(
             created_at__gte=self.week_ago - timedelta(days=7),
             created_at__lt=self.week_ago
         ).count()
@@ -101,7 +101,7 @@ class DashboardMetrics:
             marked_at__gte=self.week_ago
         )
         this_week_total = this_week_records.count()
-        this_week_present = this_week_records.filter(status='PRESENT').count()
+        this_week_present = this_week_records.filter(status=AttendanceRecord.PRESENT).count()
         this_week_rate = (this_week_present / this_week_total * 100) if this_week_total > 0 else 0
         
         # Last week's attendance rate
@@ -111,7 +111,7 @@ class DashboardMetrics:
             marked_at__lt=self.week_ago
         )
         last_week_total = last_week_records.count()
-        last_week_present = last_week_records.filter(status='PRESENT').count()
+        last_week_present = last_week_records.filter(status=AttendanceRecord.PRESENT).count()
         last_week_rate = (last_week_present / last_week_total * 100) if last_week_total > 0 else 0
         
         if last_week_rate == 0:
@@ -148,7 +148,7 @@ class DashboardMetrics:
             )
             
             total = day_records.count()
-            present = day_records.filter(status='PRESENT').count()
+            present = day_records.filter(status=AttendanceRecord.PRESENT).count()
             rate = (present / total * 100) if total > 0 else 0
             
             data.append({

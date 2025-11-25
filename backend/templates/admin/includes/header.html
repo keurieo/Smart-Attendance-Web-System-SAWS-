@@ -40,15 +40,15 @@
       <button class="user-menu__trigger" aria-label="User menu" aria-expanded="false">
         {% if user.is_authenticated %}
           {% if user.profile_picture %}
-            <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="user-avatar">
+            <img src="{{ user.profile_picture.url }}" alt="{{ user.full_name }}" class="user-avatar">
           {% else %}
             <div class="user-avatar" style="background: linear-gradient(135deg, var(--primary-500), var(--secondary-500)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 16px;">
-              {{ user.first_name|first|upper|default:user.username|first|upper }}
+              {{ user.full_name|first|upper|default:user.email|first|upper }}
             </div>
           {% endif %}
-          <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+          <span class="user-name">{{ user.full_name|default:user.email }}</span>
         {% else %}
-          <div class="user-avatar" style="background: var(--gray-300);"></div>
+          <div class="user-avatar" style="background: var(--gray-300); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 16px;">?</div>
           <span class="user-name">Guest</span>
         {% endif %}
         <svg class="chevron-icon" width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

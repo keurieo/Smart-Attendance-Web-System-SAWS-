@@ -19,7 +19,7 @@ class AttendanceSessionAdmin(admin.ModelAdmin):
             'fields': ('course', 'created_by', 'start_at', 'end_at', 'status')
         }),
         ('Location Settings', {
-            'fields': ('location', 'radius_meters')
+            'fields': ('teacher_location', 'radius_meters')
         }),
         ('QR Code', {
             'fields': ('get_qr_code_display',),
@@ -114,7 +114,7 @@ class AttendanceRecordAdmin(admin.ModelAdmin):
     list_display = ['get_student_link', 'get_session_link', 'get_status_badge', 'method', 'distance_meters', 'get_flagged', 'marked_at']
     list_filter = ['status', 'method', 'flagged_for_review', 'marked_at']
     search_fields = ['student__full_name', 'student__email', 'session__course__code']
-    readonly_fields = ['marked_at', 'updated_at', 'location_snapshot']
+    readonly_fields = ['marked_at', 'updated_at']
     list_per_page = 50
     date_hierarchy = 'marked_at'
     actions = ['flag_for_review', 'unflag_records']
@@ -124,7 +124,7 @@ class AttendanceRecordAdmin(admin.ModelAdmin):
             'fields': ('student', 'session', 'status', 'method')
         }),
         ('Location Data', {
-            'fields': ('location_snapshot', 'distance_meters', 'flagged_for_review'),
+            'fields': ('distance_meters', 'flagged_for_review'),
             'classes': ('collapse',)
         }),
         ('Timestamps', {
