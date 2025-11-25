@@ -117,7 +117,7 @@
             <div class="activity-item">
               <div class="activity-avatar">
                 {% if user.profile_picture %}
-                  <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}">
+                  <img src="{{ user.profile_picture.url }}" alt="{{ user.full_name }}">
                 {% else %}
                   <div class="avatar-placeholder">{{ user.full_name|first|upper|default:user.email|first|upper }}</div>
                 {% endif %}

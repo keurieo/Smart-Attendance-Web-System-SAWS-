@@ -30,19 +30,38 @@ class AuditLogFilter(django_filters.FilterSet):
     
     def filter_date_from(self, queryset, name, value):
         """
-        Filter logs from the specified date (inclusive, start of day).
+        Filter audit logs from the specified date (inclusive, start of day).
         
-        Accepts date strings in YYYY-MM-DD format and filters records
-        from 00:00:00 of that date onwards. Handles timezone conversion
-        to ensure accurate filtering regardless of server timezone.
+        This method filters audit log records starting from 00:00:00 of the specified date.
+        The filter is inclusive, meaning records with performed_at exactly at midnight
+        of the specified date will be included in the results.
+        
+        Date Format:
+            Expected format is YYYY-MM-DD (ISO 8601 date format).
+            Examples: '2025-11-25', '2024-01-01'
+        
+        Timezone Handling:
+            - Parses the date string as a naive date object
+            - Converts to datetime at start of day (00:00:00.000000)
+            - Makes the datetime timezone-aware using Django's configured timezone
+            - Applies filter using timezone-aware datetime for accurate comparison
+            - This ensures correct filtering regardless of server timezone settings
         
         Args:
-            queryset: The queryset to filter
-            name: The filter field name
-            value: Date string in YYYY-MM-DD format
+            queryset (QuerySet): The audit log queryset to filter
+            name (str): The filter field name (not used, required by django-filter)
+            value (str): Date string in YYYY-MM-DD format
             
         Returns:
-            Filtered queryset or original if date parsing fails
+            QuerySet: Filtered queryset containing records from the specified date onwards,
+                     or the original queryset if date parsing fails
+                     
+        Examples:
+            # Filter logs from November 20, 2025 onwards
+            ?date_from=2025-11-20
+            
+            # Combined with date_to for a range
+            ?date_from=2025-11-20&date_to=2025-11-22
         """
         if value:
             # Parse date-only string (YYYY-MM-DD)
@@ -57,19 +76,38 @@ class AuditLogFilter(django_filters.FilterSet):
     
     def filter_date_to(self, queryset, name, value):
         """
-        Filter logs until the specified date (inclusive, end of day).
+        Filter audit logs until the specified date (inclusive, end of day).
         
-        Accepts date strings in YYYY-MM-DD format and filters records
-        until 23:59:59.999999 of that date. Handles timezone conversion
-        to ensure accurate filtering regardless of server timezone.
+        This method filters audit log records up to and including 23:59:59.999999 of the
+        specified date. The filter is inclusive, meaning records with performed_at up to
+        the last microsecond of the specified date will be included in the results.
+        
+        Date Format:
+            Expected format is YYYY-MM-DD (ISO 8601 date format).
+            Examples: '2025-11-25', '2024-12-31'
+        
+        Timezone Handling:
+            - Parses the date string as a naive date object
+            - Converts to datetime at end of day (23:59:59.999999)
+            - Makes the datetime timezone-aware using Django's configured timezone
+            - Applies filter using timezone-aware datetime for accurate comparison
+            - This ensures correct filtering regardless of server timezone settings
         
         Args:
-            queryset: The queryset to filter
-            name: The filter field name
-            value: Date string in YYYY-MM-DD format
+            queryset (QuerySet): The audit log queryset to filter
+            name (str): The filter field name (not used, required by django-filter)
+            value (str): Date string in YYYY-MM-DD format
             
         Returns:
-            Filtered queryset or original if date parsing fails
+            QuerySet: Filtered queryset containing records up to and including the
+                     specified date, or the original queryset if date parsing fails
+                     
+        Examples:
+            # Filter logs until November 20, 2025 (inclusive)
+            ?date_to=2025-11-20
+            
+            # Combined with date_from for a range
+            ?date_from=2025-11-18&date_to=2025-11-20
         """
         if value:
             # Parse date-only string (YYYY-MM-DD)
