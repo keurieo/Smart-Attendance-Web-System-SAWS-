@@ -31,12 +31,14 @@
 
 
 
+
   - Use `parse_date()` to parse date-only strings (YYYY-MM-DD format)
   - Convert date to datetime using `datetime.combine(date_obj, time.max)` for end of day
   - Make datetime timezone-aware using `timezone.make_aware()`
   - Apply filter with `performed_at__lte` for inclusive comparison
   - Return filtered queryset or original if date parsing fails
   - _Requirements: 2.2, 2.4, 2.5, 8.1, 8.2, 8.3, 8.5_
+
 
 
 
