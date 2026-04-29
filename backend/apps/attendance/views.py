@@ -291,12 +291,27 @@ class AttendanceMarkingView(views.APIView):
         # Determine if token is 6-digit code or JWT
         is_6digit = re.match(r'^\d{6}$', token_value)
         
-        # Retrieve QR token from database
+        # Retrieve QR token from database first
         if is_6digit:
             qr_token = QRToken.objects.get_by_code6(token_value)
             method = AttendanceRecord.MANUAL_CODE
         else:
-            # Verify JWT token first
+            qr_token = QRToken.objects.get_by_token(token_value)
+            method = AttendanceRecord.QR_SCAN
+        
+        # Check if token exists
+        if not qr_token:
+            return Response(
+                {
+                    'error_code': 'ATT_003',
+                    'message': 'Token not found',
+                    'timestamp': timezone.now().isoformat()
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Verify JWT token after DB lookup (for QR scan tokens)
+        if not is_6digit:
             is_valid, payload, error_msg = verify_qr_token(token_value)
             if not is_valid:
                 return Response(
@@ -307,20 +322,6 @@ class AttendanceMarkingView(views.APIView):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
-            qr_token = QRToken.objects.get_by_token(token_value)
-            method = AttendanceRecord.QR_SCAN
-        
-        # Check if token exists
-        if not qr_token:
-            return Response(
-                {
-                    'error_code': 'ATT_003',
-                    'message': 'Invalid or revoked token',
-                    'timestamp': timezone.now().isoformat()
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
         
         # Check if token is expired
         current_time = timezone.now()

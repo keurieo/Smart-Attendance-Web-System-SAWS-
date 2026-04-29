@@ -44,7 +44,7 @@ const CourseManagement = () => {
   // Fetch enrollments for selected course
   const { data: enrollmentsData } = useQuery({
     queryKey: ['enrollments', selectedCourse?.id],
-    queryFn: () => adminAPI.getCourses({ course_id: selectedCourse?.id }),
+    queryFn: () => adminAPI.getEnrollments({ course_id: selectedCourse?.id }),
     enabled: !!selectedCourse,
   });
 
@@ -62,7 +62,7 @@ const CourseManagement = () => {
   const createEnrollmentMutation = useMutation({
     mutationFn: (data) => adminAPI.createEnrollment(data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['enrollments']);
+      queryClient.invalidateQueries(['enrollments', selectedCourse?.id]);
       setEnrollmentFormData({ student_id: '', course_id: selectedCourse?.id || '' });
     },
   });
@@ -71,7 +71,7 @@ const CourseManagement = () => {
   const deleteEnrollmentMutation = useMutation({
     mutationFn: (enrollmentId) => adminAPI.deleteEnrollment(enrollmentId),
     onSuccess: () => {
-      queryClient.invalidateQueries(['enrollments']);
+      queryClient.invalidateQueries(['enrollments', selectedCourse?.id]);
     },
   });
 

@@ -176,6 +176,7 @@ export const adminAPI = {
   updateCourse: (courseId, data) => api.patch(`/admin/courses/${courseId}/`, data),
   
   // Enrollment management
+  getEnrollments: (params) => api.get('/admin/enrollments/', { params }),
   createEnrollment: (data) => api.post('/admin/enrollments/', data),
   deleteEnrollment: (enrollmentId) => api.delete(`/admin/enrollments/${enrollmentId}/`),
   

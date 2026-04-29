@@ -149,29 +149,6 @@ const QRViewer = ({ session }) => {
         </div>
       )}
 
-      {/* QR URL (for sharing) */}
-      {session.qr_url && (
-        <div className="text-center">
-          <p className="text-xs text-gray-500 mb-2">Share this URL:</p>
-          <div className="flex items-center justify-center space-x-2">
-            <input
-              type="text"
-              value={session.qr_url}
-              readOnly
-              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md bg-gray-50"
-            />
-            <button
-              onClick={() => {
-                navigator.clipboard.writeText(session.qr_url);
-              }}
-              className="px-3 py-2 bg-gray-600 text-white text-sm rounded-md hover:bg-gray-700"
-            >
-              Copy
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Session Status */}
       <div className="mt-6 pt-6 border-t border-gray-200">
         <div className="flex items-center justify-between text-sm">

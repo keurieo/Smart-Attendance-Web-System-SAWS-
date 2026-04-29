@@ -3,6 +3,7 @@ import api from '../services/api';
 import { storage } from '../utils/storage';
 
 export const AuthContext = createContext(null);
+const SESSION_EXPIRED_KEY = 'session_expired';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -24,10 +25,10 @@ export const AuthProvider = ({ children }) => {
           const response = await api.get('/accounts/users/me/');
           setUser(response.data);
           storage.setUser(response.data);
-        } catch (error) {
-          // Token invalid, clear auth state
-          logout();
-        }
+          } catch (error) {
+            // Token invalid, clear auth state with message
+            logoutWithMessage('Your session has expired. Please log in again.');
+          }
       }
       
       setLoading(false);
@@ -75,6 +76,13 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   }, []);
 
+  const logoutWithMessage = useCallback((message) => {
+    if (message) {
+      sessionStorage.setItem(SESSION_EXPIRED_KEY, message);
+    }
+    logout();
+  }, [logout]);
+
   // Refresh token function
   const refreshToken = useCallback(async () => {
     try {
@@ -111,6 +119,7 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     login,
     logout,
+    logoutWithMessage,
     refreshToken,
     updateUser,
   };

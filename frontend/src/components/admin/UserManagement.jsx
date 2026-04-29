@@ -14,15 +14,16 @@ const UserManagement = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const roles = ['admin', 'teacher', 'student'];
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     full_name: '',
-    role_id: '',
+    role: '',
   });
   const [editFormData, setEditFormData] = useState({
     full_name: '',
-    role_id: '',
+    role: '',
     is_active: true,
   });
 
@@ -38,7 +39,7 @@ const UserManagement = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);
       setIsCreateModalOpen(false);
-      setFormData({ email: '', password: '', full_name: '', role_id: '' });
+      setFormData({ email: '', password: '', full_name: '', role: '' });
     },
   });
 
@@ -77,7 +78,7 @@ const UserManagement = () => {
     setSelectedUser(user);
     setEditFormData({
       full_name: user.full_name,
-      role_id: user.role_id,
+      role: user.role,
       is_active: user.is_active,
     });
     setIsEditModalOpen(true);
@@ -336,14 +337,16 @@ const UserManagement = () => {
             </label>
             <select
               required
-              value={formData.role_id}
-              onChange={(e) => setFormData({ ...formData, role_id: e.target.value })}
+              value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Role</option>
-              <option value="1">Admin</option>
-              <option value="2">Teacher</option>
-              <option value="3">Student</option>
+              {roles.map((role) => (
+                <option key={role} value={role}>
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
           {createUserMutation.isError && (
@@ -395,13 +398,15 @@ const UserManagement = () => {
             </label>
             <select
               required
-              value={editFormData.role_id}
-              onChange={(e) => setEditFormData({ ...editFormData, role_id: e.target.value })}
+              value={editFormData.role}
+              onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="1">Admin</option>
-              <option value="2">Teacher</option>
-              <option value="3">Student</option>
+              {roles.map((role) => (
+                <option key={role} value={role}>
+                  {role.charAt(0).toUpperCase() + role.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
           <div>

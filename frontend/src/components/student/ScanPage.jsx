@@ -3,6 +3,7 @@ import QRScanner from './QRScanner';
 import ManualCodeEntry from './ManualCodeEntry';
 import { useGeolocation } from '../../hooks/useGeolocation';
 import { attendanceAPI } from '../../services/api';
+import { parseError } from '../../utils/errorHandler';
 
 /**
  * ScanPage component with tabs for QR scan and manual entry
@@ -68,16 +69,14 @@ const ScanPage = () => {
         data: response.data,
       });
     } catch (error) {
-      // Error response
-      const errorMessage = error.data?.message || 
-                          error.data?.detail || 
-                          error.message || 
-                          'Failed to mark attendance. Please try again.';
+      const parsedError = parseError(error);
+      const responseData = error.response?.data || parsedError.details;
+      const errorMessage = parsedError.message || 'Failed to mark attendance. Please try again.';
       
       setResult({
         success: false,
         message: errorMessage,
-        data: error.data,
+        data: responseData,
       });
     } finally {
       setSubmitting(false);

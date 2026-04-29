@@ -27,6 +27,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Trust proxy headers (for Railway/Render)
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+TRUSTED_PROXY_IPS = env.list('TRUSTED_PROXY_IPS', default=[])
 
 # Email backend for production
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

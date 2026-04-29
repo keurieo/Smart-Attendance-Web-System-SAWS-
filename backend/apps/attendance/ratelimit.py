@@ -25,12 +25,16 @@ def get_client_ip(request):
     Returns:
         str: Client IP address
     """
+    from django.conf import settings
+
+    remote_addr = request.META.get('REMOTE_ADDR')
+    trusted_proxies = set(getattr(settings, 'TRUSTED_PROXY_IPS', []))
+
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0].strip()
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
+    if x_forwarded_for and remote_addr in trusted_proxies:
+        return x_forwarded_for.split(',')[0].strip()
+
+    return remote_addr
 
 
 def rate_limit_key(prefix, identifier):

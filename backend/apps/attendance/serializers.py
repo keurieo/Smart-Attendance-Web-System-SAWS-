@@ -16,7 +16,6 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
     course_code = serializers.CharField(source='course.code', read_only=True)
     course_title = serializers.CharField(source='course.title', read_only=True)
     qr_token = serializers.SerializerMethodField()
-    qr_url = serializers.SerializerMethodField()
     code6 = serializers.SerializerMethodField()
     
     class Meta:
@@ -24,7 +23,7 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'course_id', 'schedule_id', 'start_at', 'end_at', 
             'radius_meters', 'latitude', 'longitude', 'notes', 'status',
-            'course_code', 'course_title', 'qr_token', 'qr_url', 'code6',
+            'course_code', 'course_title', 'qr_token', 'code6',
             'created_at'
         ]
         read_only_fields = ['id', 'status', 'created_at']
@@ -49,15 +48,6 @@ class AttendanceSessionSerializer(serializers.ModelSerializer):
         """Get the QR token for this session."""
         if hasattr(obj, '_qr_token_data'):
             return obj._qr_token_data.get('token')
-        return None
-    
-    def get_qr_url(self, obj):
-        """Get the QR URL for this session."""
-        if hasattr(obj, '_qr_token_data'):
-            token = obj._qr_token_data.get('token')
-            if token:
-                # Generate a URL that the frontend can use
-                return f"/attendance/scan?token={token}"
         return None
     
     def get_code6(self, obj):
